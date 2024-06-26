@@ -1,0 +1,74 @@
+[package]
+name = "oxidetalis_core"
+description = "OxideTalis server core"
+edition = "2021"
+license = "MIT"
+authors.workspace = true
+readme.workspace = true
+repository.workspace = true
+version.workspace = true
+rust-version.workspace = true
+
+
+[dependencies]
+base58     = { workspace = true }
+thiserror  = { workspace = true }
+salvo_core = { workspace = true }
+salvo-oapi = { workspace = true }
+serde      = { workspace = true }
+log        = { workspace = true }
+logcall    = { workspace = true }
+cbc        = { version = "0.1.2", features = ["alloc", "std"] }
+k256       = { version = "0.13.3", default-features = false, features = ["ecdh"] }
+rand       = { version = "0.8.5", default-features = false, features = ["std_rng", "std"] }
+aes        = "0.8.4"
+hex        = "0.4.3"
+hmac       = "0.12.1"
+sha2       = "0.10.8"
+
+
+[lints.rust]
+unsafe_code = "deny"
+missing_docs = "warn"
+
+[lints.clippy]
+wildcard_imports = "deny"
+manual_let_else = "deny"
+match_bool = "deny"
+match_on_vec_items = "deny"
+or_fun_call = "deny"
+panic = "deny"
+unwrap_used = "deny"
+
+missing_assert_message = "warn"
+missing_const_for_fn = "warn"
+missing_errors_doc = "warn"
+absolute_paths = "warn"
+cast_lossless = "warn"
+clone_on_ref_ptr = "warn"
+cloned_instead_of_copied = "warn"
+dbg_macro = "warn"
+default_trait_access = "warn"
+empty_enum_variants_with_brackets = "warn"
+empty_line_after_doc_comments = "warn"
+empty_line_after_outer_attr = "warn"
+empty_structs_with_brackets = "warn"
+enum_glob_use = "warn"
+equatable_if_let = "warn"
+explicit_iter_loop = "warn"
+filetype_is_file = "warn"
+filter_map_next = "warn"
+flat_map_option = "warn"
+float_cmp = "warn"
+format_push_string = "warn"
+future_not_send = "warn"
+if_not_else = "warn"
+if_then_some_else_none = "warn"
+implicit_clone = "warn"
+inconsistent_struct_constructor = "warn"
+iter_filter_is_ok = "warn"
+iter_filter_is_some = "warn"
+iter_not_returning_iterator = "warn"
+manual_is_variant_and = "warn"
+option_if_let_else = "warn"
+option_option = "warn"

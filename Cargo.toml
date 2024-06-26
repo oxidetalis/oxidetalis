@@ -1,0 +1,30 @@
+[workspace]
+members = ["crates/*"]
+resolver = "2"
+
+[workspace.package]
+authors = ["OxideTalis Developers <otmp@4rs.nl>"]
+readme = "README.md"
+repository = "https://git.4rs.nl/oxidetalis/oxidetalis"
+version = "0.1.0"
+rust-version = "1.76.0"
+
+[workspace.dependencies]
+# Local crates
+oxidetalis_core       = { path = "crates/oxidetalis_core" }
+oxidetalis_config     = { path = "crates/oxidetalis_config" }
+oxidetalis_migrations = { path = "crates/oxidetalis_migrations" }
+oxidetalis_entities   = { path = "crates/oxidetalis_entities" }
+# Shered dependencies
+base58     = "0.2.0"
+serde      = "1.0.203"
+thiserror  = "1.0.61"
+log        = "0.4.21"
+logcall    = "0.1.9"
+chrono     = "0.4.38"
+sea-orm    = { version = "0.12.15", features = ["with-chrono", "macros"] }
+salvo_core = { version = "0.68.3", default-features = false }
+salvo-oapi = { version = "0.68.3", features = ["rapidoc","redoc","scalar","swagger-ui"] }
+
+[profile.release]
+strip = true # Automatically strip symbols from the binary.

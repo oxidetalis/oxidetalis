@@ -1,0 +1,3 @@
+/target
+# Ignore the server configration file (Used for local development only)
+config.toml
