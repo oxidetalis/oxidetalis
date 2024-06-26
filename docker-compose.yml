@@ -1,0 +1,25 @@
+version: '3'
+services:
+  oxidetalis:
+    container_name: oxidetalis
+    build:
+      context: ./
+      dockerfile: ./crates/oxidetalis/Dockerfile
+    environment:
+      - OXIDETALIS_CONFIG=/app/config.toml
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+    volumes:
+      - ./config.toml:/app/config.toml
+  db:
+    container_name: oxidetalis_postgres
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: oxidetalis
+      POSTGRES_PASSWORD: oxidetalis
+      POSTGRES_DB: oxidetalis_db
+    # This for devlopment only
+    ports:
+      - 5432:5432
