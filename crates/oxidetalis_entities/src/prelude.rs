@@ -30,7 +30,7 @@ pub use sea_orm::{
     QueryOrder,
     QuerySelect,
     Set,
-    SqlErr, 
+    SqlErr,
 };
 
 pub use super::users::{
