@@ -23,8 +23,8 @@ log        = "0.4.21"
 logcall    = "0.1.9"
 chrono     = "0.4.38"
 sea-orm    = { version = "0.12.15", features = ["with-chrono", "macros"] }
-salvo_core = { version = "0.68.3", default-features = false }
-salvo-oapi = { version = "0.68.3", features = ["rapidoc","redoc","scalar","swagger-ui"] }
+salvo_core = { version = "0.68.3", default-features = false, features = ["rustls"] }
+salvo-oapi = { version = "0.68.3", default-features = false, features = ["rapidoc","redoc","scalar","swagger-ui"] }
 
 [profile.release]
 strip = true # Automatically strip symbols from the binary.
