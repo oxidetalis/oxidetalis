@@ -106,6 +106,30 @@ impl K256Secret {
         )
     }
 
+    /// Sign a data with the shared secret.
+    /// 
+    /// The signature is exiplained in the OTMP specification.
+    pub fn sign_with_shared_secret(data: &[u8], shared_secret: &[u8; 32]) -> CoreSignature {
+        let mut time_and_nonce = [0u8; 24];
+        time_and_nonce[0..=7].copy_from_slice(
+            &SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .expect("SystemTime before UNIX EPOCH!")
+                .as_secs()
+                .to_be_bytes(),
+        );
+        thread_rng().fill_bytes(&mut time_and_nonce[8..=23]);
+
+        let mut hmac_secret = [0u8; 56];
+        hmac_secret[0..=31].copy_from_slice(shared_secret);
+        hmac_secret[32..=55].copy_from_slice(&time_and_nonce);
+        let mut signature = [0u8; 56];
+        signature[0..=31].copy_from_slice(&hmac_sha256(data, &hmac_secret));
+        signature[32..=55].copy_from_slice(&time_and_nonce);
+
+        CoreSignature::from(signature)
+    }
+
     /// Returns the public key.
     pub fn pubkey(&self) -> CorePublicKey {
         CorePublicKey::try_from(
@@ -182,24 +206,7 @@ impl K256Secret {
     /// The signature is exiplained in the OTMP specification.
     #[logcall]
     pub fn sign(&self, data: &[u8], sign_to: &CorePublicKey) -> CoreSignature {
-        let mut time_and_nonce = [0u8; 24];
-        time_and_nonce[0..=7].copy_from_slice(
-            &SystemTime::now()
-                .duration_since(UNIX_EPOCH)
-                .expect("SystemTime before UNIX EPOCH!")
-                .as_secs()
-                .to_be_bytes(),
-        );
-        thread_rng().fill_bytes(&mut time_and_nonce[8..=23]);
-
-        let mut hmac_secret = [0u8; 56];
-        hmac_secret[0..=31].copy_from_slice(&self.shared_secret(sign_to));
-        hmac_secret[32..=55].copy_from_slice(&time_and_nonce);
-        let mut signature = [0u8; 56];
-        signature[0..=31].copy_from_slice(&hmac_sha256(data, &hmac_secret));
-        signature[32..=55].copy_from_slice(&time_and_nonce);
-
-        CoreSignature::from(signature)
+        Self::sign_with_shared_secret(data, &self.shared_secret(sign_to))
     }
 
     /// Verify a signature with the shared secret.
