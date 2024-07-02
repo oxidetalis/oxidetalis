@@ -45,7 +45,7 @@ pub struct PublicKey([u8; 33]);
 pub struct PrivateKey([u8; 32]);
 
 /// OTMP signature
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub struct Signature {
     hmac_output: [u8; 32],
     timestamp:   [u8; 8],
