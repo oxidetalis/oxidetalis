@@ -52,7 +52,7 @@ pub enum ApiError {
     /// The user enterd tow different public keys
     /// one in the header and other in the request body
     /// (400 Bad Request)
-    #[error("TODO")]
+    #[error("You entered two different public keys")]
     TwoDifferentKeys,
 }
 
