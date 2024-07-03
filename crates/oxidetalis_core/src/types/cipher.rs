@@ -37,7 +37,7 @@ use crate::cipher::CipherError;
 const CORRECT_LENGTH: &str = "The length is correct";
 
 /// K256 public key
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
 pub struct PublicKey([u8; 33]);
 
 /// K256 private key
@@ -45,7 +45,7 @@ pub struct PublicKey([u8; 33]);
 pub struct PrivateKey([u8; 32]);
 
 /// OTMP signature
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq, Hash)]
 pub struct Signature {
     hmac_output: [u8; 32],
     timestamp:   [u8; 8],
