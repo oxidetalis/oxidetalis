@@ -30,7 +30,7 @@ pub trait DepotExt {
     /// Returns the server configuration
     fn config(&self) -> &Config;
     /// Retutns the nonce cache
-    fn nonce_cache(&self) -> &NonceCache;
+    fn nonce_cache(&self) -> Arc<NonceCache>;
     /// Returns the size of the nonce cache
     fn nonce_cache_size(&self) -> &usize;
 }
@@ -52,9 +52,11 @@ impl DepotExt for Depot {
         self.obtain::<Arc<Config>>().expect("Config not found")
     }
 
-    fn nonce_cache(&self) -> &NonceCache {
-        self.obtain::<Arc<NonceCache>>()
-            .expect("Nonce cache not found")
+    fn nonce_cache(&self) -> Arc<NonceCache> {
+        Arc::clone(
+            self.obtain::<Arc<NonceCache>>()
+                .expect("Nonce cache not found"),
+        )
     }
 
     fn nonce_cache_size(&self) -> &usize {
