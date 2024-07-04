@@ -18,10 +18,16 @@ use std::sync::Arc;
 
 use chrono::Utc;
 use oxidetalis_config::Config;
-use salvo::Depot;
+use rayon::iter::{IntoParallelRefMutIterator, ParallelIterator};
+use salvo::{websocket::Message, Depot};
 use sea_orm::DatabaseConnection;
+use uuid::Uuid;
 
-use crate::{routes::DEPOT_NONCE_CACHE_SIZE, NonceCache};
+use crate::{
+    routes::DEPOT_NONCE_CACHE_SIZE,
+    websocket::{OnlineUsers, ServerEvent, SocketUserData},
+    NonceCache,
+};
 
 /// Extension trait for the Depot.
 pub trait DepotExt {
@@ -40,6 +46,24 @@ pub trait NonceCacheExt {
     /// Add a nonce to the cache, returns `true` if the nonce is added, `false`
     /// if the nonce is already exist in the cache.
     fn add_nonce(&self, nonce: &[u8; 16], limit: &usize) -> bool;
+}
+
+/// Extension trait for online websocket users
+pub trait OnlineUsersExt {
+    /// Add new user to the online users
+    async fn add_user(&self, conn_id: &Uuid, data: SocketUserData);
+
+    /// Remove user from online users
+    async fn remove_user(&self, conn_id: &Uuid);
+
+    /// Ping all online users
+    async fn ping_all(&self);
+
+    /// Update user pong at time
+    async fn update_pong(&self, conn_id: &Uuid);
+
+    /// Disconnect inactive users (who not respond for the ping event)
+    async fn disconnect_inactive_users(&self);
 }
 
 impl DepotExt for Depot {
@@ -89,5 +113,46 @@ impl NonceCacheExt for &NonceCache {
         }
         cache.insert(*nonce, now);
         true
+    }
+}
+
+impl OnlineUsersExt for OnlineUsers {
+    async fn add_user(&self, conn_id: &Uuid, data: SocketUserData) {
+        self.write().await.insert(*conn_id, data);
+    }
+
+    async fn remove_user(&self, conn_id: &Uuid) {
+        self.write().await.remove(conn_id);
+    }
+
+    async fn ping_all(&self) {
+        let now = Utc::now();
+        self.write().await.par_iter_mut().for_each(|(_, u)| {
+            u.pinged_at = now;
+            let _ = u.sender.unbounded_send(Ok(Message::from(
+                &ServerEvent::ping().sign(&u.shared_secret),
+            )));
+        });
+    }
+
+    async fn update_pong(&self, conn_id: &Uuid) {
+        if let Some(user) = self.write().await.get_mut(conn_id) {
+            user.ponged_at = Utc::now()
+        }
+    }
+
+    async fn disconnect_inactive_users(&self) {
+        let now = Utc::now().timestamp();
+        let is_inactive =
+            |u: &SocketUserData| u.pinged_at > u.ponged_at && now - u.pinged_at.timestamp() >= 5;
+        self.read()
+            .await
+            .iter()
+            .filter(|(_, u)| is_inactive(u))
+            .for_each(|(_, u)| {
+                log::info!("Disconnected from {}, inactive", u.public_key);
+                u.sender.close_channel()
+            });
+        self.write().await.retain(|_, u| !is_inactive(u));
     }
 }
