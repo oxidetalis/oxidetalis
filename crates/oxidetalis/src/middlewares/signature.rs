@@ -42,20 +42,18 @@ pub async fn signature_check(
     let mut write_err =
         |message: &str, status_code| super::write_error(res, ctrl, message.to_owned(), status_code);
 
-    if req.body().is_end_stream() {
-        write_err(
-            "Request body is empty, the signature need a signed body",
-            UNAUTHORIZED,
-        );
-        return;
-    }
-    let json_body = match req.parse_json::<serde_json::Value>().await {
-        Ok(j) => j.to_string(),
-        Err(err) => {
-            write_err(&err.to_string(), UNAUTHORIZED);
-            return;
+    let data = if req.body().is_end_stream() {
+        format!("{}{}", req.method(), req.uri().path())
+    } else {
+        match req.parse_json::<serde_json::Value>().await {
+            Ok(j) => j.to_string(),
+            Err(err) => {
+                write_err(&err.to_string(), UNAUTHORIZED);
+                return;
+            }
         }
     };
+
     let signature = match utils::extract_signature(req) {
         Ok(s) => s,
         Err(err) => {
@@ -77,7 +75,7 @@ pub async fn signature_check(
             &sender_public_key,
             &depot.config().server.private_key,
             &signature,
-            json_body.as_bytes(),
+            data.as_bytes(),
         )
     {
         write_err("Invalid signature", UNAUTHORIZED);
