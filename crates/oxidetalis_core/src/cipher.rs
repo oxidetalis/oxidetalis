@@ -33,7 +33,6 @@ use k256::{
     NonZeroScalar,
     PublicKey,
 };
-use logcall::logcall;
 use rand::{thread_rng, RngCore};
 
 use crate::types::{
@@ -204,7 +203,6 @@ impl K256Secret {
     /// Sign a data with the shared secret.
     ///
     /// The signature is explained in the OTMP specification.
-    #[logcall]
     pub fn sign(&self, data: &[u8], sign_to: &CorePublicKey) -> CoreSignature {
         Self::sign_with_shared_secret(data, &self.shared_secret(sign_to))
     }
@@ -213,7 +211,6 @@ impl K256Secret {
     ///
     /// Note:
     /// The time and the nonce will not be checked here
-    #[logcall]
     pub fn verify(&self, data: &[u8], signature: &CoreSignature, signer: &CorePublicKey) -> bool {
         signature.verify(data, &self.shared_secret(signer))
     }
