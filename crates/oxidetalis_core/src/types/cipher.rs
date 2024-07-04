@@ -31,7 +31,7 @@ use salvo_oapi::{
     ToSchema,
 };
 
-use crate::cipher::CipherError;
+use crate::cipher::{hmac_sha256, CipherError};
 
 /// Correct length except message
 const CORRECT_LENGTH: &str = "The length is correct";
@@ -89,6 +89,16 @@ impl Signature {
         sig[32..=39].copy_from_slice(&self.timestamp);
         sig[40..=55].copy_from_slice(&self.nonce);
         sig
+    }
+
+    /// Verify the signature with the given shared secret.
+    pub fn verify(&self, data: &[u8], shared_secret: &[u8; 32]) -> bool {
+        let mut hmac_secret = [0u8; 56];
+        hmac_secret[0..=31].copy_from_slice(shared_secret);
+        hmac_secret[32..=39].copy_from_slice(self.timestamp());
+        hmac_secret[40..=55].copy_from_slice(self.nonce());
+
+        &hmac_sha256(data, &hmac_secret) == self.hmac_output()
     }
 }
 

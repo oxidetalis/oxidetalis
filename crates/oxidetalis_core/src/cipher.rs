@@ -107,7 +107,7 @@ impl K256Secret {
     }
 
     /// Sign a data with the shared secret.
-    /// 
+    ///
     /// The signature is exiplained in the OTMP specification.
     pub fn sign_with_shared_secret(data: &[u8], shared_secret: &[u8; 32]) -> CoreSignature {
         let mut time_and_nonce = [0u8; 24];
@@ -209,22 +209,18 @@ impl K256Secret {
         Self::sign_with_shared_secret(data, &self.shared_secret(sign_to))
     }
 
-    /// Verify a signature with the shared secret.
+    /// Verify the given signature with the signer.
     ///
     /// Note:
     /// The time and the nonce will not be checked here
     #[logcall]
     pub fn verify(&self, data: &[u8], signature: &CoreSignature, signer: &CorePublicKey) -> bool {
-        let mut hmac_secret = [0u8; 56];
-        hmac_secret[0..=31].copy_from_slice(&self.shared_secret(signer));
-        hmac_secret[32..=39].copy_from_slice(signature.timestamp());
-        hmac_secret[40..=55].copy_from_slice(signature.nonce());
-
-        &hmac_sha256(data, &hmac_secret) == signature.hmac_output()
+        signature.verify(data, &self.shared_secret(signer))
     }
 }
 
-fn hmac_sha256(data: &[u8], secret: &[u8]) -> [u8; 32] {
+/// Compute the HMAC-SHA256 of the given data with the given secret.
+pub(crate) fn hmac_sha256(data: &[u8], secret: &[u8]) -> [u8; 32] {
     let mut mac = HmacSha256::new_from_slice(secret).expect("HMAC can take key of any size");
     mac.update(data);
     mac.finalize().into_bytes().into()
