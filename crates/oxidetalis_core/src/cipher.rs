@@ -203,7 +203,7 @@ impl K256Secret {
 
     /// Sign a data with the shared secret.
     ///
-    /// The signature is exiplained in the OTMP specification.
+    /// The signature is explained in the OTMP specification.
     #[logcall]
     pub fn sign(&self, data: &[u8], sign_to: &CorePublicKey) -> CoreSignature {
         Self::sign_with_shared_secret(data, &self.shared_secret(sign_to))

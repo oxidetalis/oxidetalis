@@ -49,7 +49,7 @@ pub enum ApiError {
     /// The entered public key is already registered (400 Bad Request)
     #[error("The entered public key is already registered")]
     DuplicatedUser,
-    /// The user enterd tow different public keys
+    /// The user entered two different public keys
     /// one in the header and other in the request body
     /// (400 Bad Request)
     #[error("You entered two different public keys")]

@@ -15,7 +15,7 @@ oxidetalis_core       = { path = "crates/oxidetalis_core" }
 oxidetalis_config     = { path = "crates/oxidetalis_config" }
 oxidetalis_migrations = { path = "crates/oxidetalis_migrations" }
 oxidetalis_entities   = { path = "crates/oxidetalis_entities" }
-# Shered dependencies
+# Shared dependencies
 base58     = "0.2.0"
 serde      = "1.0.203"
 thiserror  = "1.0.61"
