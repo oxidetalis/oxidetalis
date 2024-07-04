@@ -142,17 +142,14 @@ impl OnlineUsersExt for OnlineUsers {
     }
 
     async fn disconnect_inactive_users(&self) {
-        let now = Utc::now().timestamp();
-        let is_inactive =
-            |u: &SocketUserData| u.pinged_at > u.ponged_at && now - u.pinged_at.timestamp() >= 5;
-        self.read()
-            .await
-            .iter()
-            .filter(|(_, u)| is_inactive(u))
-            .for_each(|(_, u)| {
+        self.write().await.retain(|_, u| {
+            // if we send ping and the client doesn't send pong
+            if u.pinged_at > u.ponged_at {
                 log::info!("Disconnected from {}, inactive", u.public_key);
-                u.sender.close_channel()
-            });
-        self.write().await.retain(|_, u| !is_inactive(u));
+                u.sender.close_channel();
+                return false;
+            }
+            true
+        });
     }
 }

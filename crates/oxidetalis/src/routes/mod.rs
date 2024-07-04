@@ -25,7 +25,7 @@ use salvo::rate_limiter::{BasicQuota, FixedGuard, MokaStore, RateLimiter, Remote
 use salvo::{catcher::Catcher, logging::Logger, prelude::*};
 
 use crate::schemas::MessageSchema;
-use crate::{middlewares, NonceCache};
+use crate::{middlewares, websocket, NonceCache};
 
 mod user;
 
@@ -141,6 +141,7 @@ pub fn service(conn: sea_orm::DatabaseConnection, config: &Config) -> Service {
 
     let router = Router::new()
         .push(Router::with_path("user").push(user::route()))
+        .push(Router::with_path("ws").push(websocket::route()))
         .hoop(middlewares::add_server_headers)
         .hoop(Logger::new())
         .hoop(

@@ -30,6 +30,7 @@ mod middlewares;
 mod routes;
 mod schemas;
 mod utils;
+mod websocket;
 
 /// Nonce cache type, used to store nonces for a certain amount of time
 pub type NonceCache = Mutex<HashMap<[u8; 16], i64>>;
