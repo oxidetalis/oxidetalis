@@ -14,9 +14,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://gnu.org/licenses/agpl-3.0>.
 
-use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
-use std::{env, mem};
+use std::env;
+use std::sync::Arc;
 
 use oxidetalis_config::Config;
 use salvo::http::ResBody;
@@ -24,17 +23,11 @@ use salvo::oapi::{Info, License};
 use salvo::rate_limiter::{BasicQuota, FixedGuard, MokaStore, RateLimiter, RemoteIpIssuer};
 use salvo::{catcher::Catcher, logging::Logger, prelude::*};
 
+use crate::nonce::NonceCache;
 use crate::schemas::MessageSchema;
-use crate::{middlewares, websocket, NonceCache};
+use crate::{middlewares, websocket};
 
 mod user;
-
-/// Size of each entry in the nonce cache
-pub(crate) const NONCE_ENTRY_SIZE: usize = mem::size_of::<[u8; 16]>() + mem::size_of::<i16>();
-/// Size of the hashmap itself without the entrys (48 bytes)
-pub(crate) const HASH_MAP_SIZE: usize = mem::size_of::<HashMap<u8, u8>>();
-/// Name of the nonce cache size in the depot
-pub(crate) const DEPOT_NONCE_CACHE_SIZE: &str = "NONCE_CACHE_SIZE";
 
 pub fn write_json_body(res: &mut Response, json_body: impl serde::Serialize) {
     res.write_body(serde_json::to_string(&json_body).expect("Json serialization can't be fail"))
@@ -69,7 +62,7 @@ async fn handle_server_errors(res: &mut Response, ctrl: &mut FlowCtrl) {
                     err.brief.trim_end_matches('.'),
                     err.cause
                         .as_deref()
-                        .map_or_else(|| "".to_owned(), ToString::to_string)
+                        .map_or_else(String::new, ToString::to_string)
                         .trim_end_matches('.')
                         .split(':')
                         .last()
@@ -129,13 +122,9 @@ fn route_openapi(config: &Config, router: Router) -> Router {
 }
 
 pub fn service(conn: sea_orm::DatabaseConnection, config: &Config) -> Service {
-    let nonce_cache_size = config.server.nonce_cache_size.as_bytes();
-    let nonce_cache: NonceCache = Mutex::new(HashMap::with_capacity(
-        (nonce_cache_size - HASH_MAP_SIZE) / NONCE_ENTRY_SIZE,
-    ));
+    let nonce_cache: NonceCache = NonceCache::new(&config.server.nonce_cache_size);
     log::info!(
-        "Nonce cache created with a capacity of {} ({})",
-        (nonce_cache_size - HASH_MAP_SIZE) / NONCE_ENTRY_SIZE,
+        "Nonce cache created with a capacity of {}",
         config.server.nonce_cache_size
     );
 
@@ -146,7 +135,6 @@ pub fn service(conn: sea_orm::DatabaseConnection, config: &Config) -> Service {
         .hoop(Logger::new())
         .hoop(
             affix::inject(Arc::new(conn))
-                .insert(DEPOT_NONCE_CACHE_SIZE, Arc::new(nonce_cache_size))
                 .inject(Arc::new(config.clone()))
                 .inject(Arc::new(nonce_cache)),
         );

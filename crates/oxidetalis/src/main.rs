@@ -17,7 +17,7 @@
 #![doc = include_str!("../../../README.md")]
 #![warn(missing_docs, unsafe_code)]
 
-use std::{collections::HashMap, process::ExitCode, sync::Mutex};
+use std::process::ExitCode;
 
 use oxidetalis_config::{CliArgs, Parser};
 use oxidetalis_migrations::MigratorTrait;
@@ -27,13 +27,11 @@ mod database;
 mod errors;
 mod extensions;
 mod middlewares;
+mod nonce;
 mod routes;
 mod schemas;
 mod utils;
 mod websocket;
-
-/// Nonce cache type, used to store nonces for a certain amount of time
-pub type NonceCache = Mutex<HashMap<[u8; 16], i64>>;
 
 async fn try_main() -> errors::Result<()> {
     pretty_env_logger::init_timed();
@@ -50,6 +48,7 @@ async fn try_main() -> errors::Result<()> {
     let local_addr = format!("{}:{}", config.server.host, config.server.port);
     let acceptor = TcpListener::new(&local_addr).bind().await;
     log::info!("Server listening on http://{local_addr}");
+    log::info!("Chat websocket on ws://{local_addr}/ws/chat");
     if config.openapi.enable {
         log::info!(
             "The openapi schema is available at http://{local_addr}{}",

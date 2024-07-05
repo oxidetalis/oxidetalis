@@ -19,7 +19,7 @@
 use oxidetalis_core::types::Signature;
 use serde::{Deserialize, Serialize};
 
-use crate::{utils, NonceCache};
+use crate::{nonce::NonceCache, utils};
 
 /// Client websocket event
 #[derive(Deserialize, Clone, Debug)]
@@ -49,13 +49,12 @@ impl ClientEventType {
 
 impl ClientEvent {
     /// Verify the signature of the event
-    pub fn verify_signature(
+    pub async fn verify_signature(
         &self,
         shared_secret: &[u8; 32],
         nonce_cache: &NonceCache,
-        nonce_limit: &usize,
     ) -> bool {
-        utils::is_valid_nonce(&self.signature, nonce_cache, nonce_limit)
+        utils::is_valid_nonce(&self.signature, nonce_cache).await
             && self.signature.verify(&self.event.data(), shared_secret)
     }
 }

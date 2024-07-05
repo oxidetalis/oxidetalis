@@ -27,7 +27,7 @@ use oxidetalis_core::{
 };
 use salvo::Request;
 
-use crate::{extensions::NonceCacheExt, NonceCache};
+use crate::nonce::NonceCache;
 
 /// Returns the postgres database url
 #[logcall]
@@ -43,16 +43,12 @@ pub(crate) fn postgres_url(db_config: &Postgres) -> String {
 }
 
 /// Returns true if the given nonce a valid nonce.
-pub(crate) fn is_valid_nonce(
-    signature: &Signature,
-    nonce_cache: &NonceCache,
-    nonce_cache_limit: &usize,
-) -> bool {
+pub(crate) async fn is_valid_nonce(signature: &Signature, nonce_cache: &NonceCache) -> bool {
     let new_timestamp = Utc::now()
         .timestamp()
         .checked_sub(u64::from_be_bytes(*signature.timestamp()) as i64)
         .is_some_and(|n| n <= 20);
-    let unused_nonce = new_timestamp && nonce_cache.add_nonce(signature.nonce(), nonce_cache_limit);
+    let unused_nonce = new_timestamp && nonce_cache.add_nonce(signature.nonce()).await;
     new_timestamp && unused_nonce
 }
 

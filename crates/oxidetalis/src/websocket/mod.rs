@@ -41,8 +41,8 @@ use uuid::Uuid;
 use crate::{
     extensions::{DepotExt, OnlineUsersExt},
     middlewares,
+    nonce::NonceCache,
     utils,
-    NonceCache,
 };
 
 /// Online users type
@@ -92,7 +92,6 @@ pub async fn user_connected(
     depot: &Depot,
 ) -> Result<(), StatusError> {
     let nonce_cache = depot.nonce_cache();
-    let nonce_limit = *depot.nonce_cache_size();
     let public_key =
         utils::extract_public_key(req).expect("The public key was checked in the middleware");
     // FIXME: The config should hold `K256Secret` not `PrivateKey`
@@ -101,7 +100,7 @@ pub async fn user_connected(
 
     WebSocketUpgrade::new()
         .upgrade(req, res, move |ws| {
-            handle_socket(ws, nonce_cache, nonce_limit, public_key, shared_secret)
+            handle_socket(ws, nonce_cache, public_key, shared_secret)
         })
         .await
 }
@@ -110,7 +109,6 @@ pub async fn user_connected(
 async fn handle_socket(
     ws: WebSocket,
     nonce_cache: Arc<NonceCache>,
-    nonce_limit: usize,
     user_public_key: PublicKey,
     user_shared_secret: [u8; 32],
 ) {
@@ -131,7 +129,7 @@ async fn handle_socket(
 
     let fut = async move {
         while let Some(Ok(msg)) = user_ws_receiver.next().await {
-            match handle_ws_msg(msg, &nonce_cache, &nonce_limit, &user_shared_secret) {
+            match handle_ws_msg(msg, &nonce_cache, &user_shared_secret).await {
                 Ok(event) => {
                     if let Some(server_event) = handle_events(event, &conn_id).await {
                         if let Err(err) = sender.unbounded_send(Ok(Message::from(
@@ -158,10 +156,9 @@ async fn handle_socket(
 }
 
 /// Handle websocket msg
-fn handle_ws_msg(
+async fn handle_ws_msg(
     msg: Message,
     nonce_cache: &NonceCache,
-    nonce_limit: &usize,
     shared_secret: &[u8; 32],
 ) -> WsResult<ClientEvent> {
     let Ok(text) = msg.to_str() else {
@@ -174,7 +171,7 @@ fn handle_ws_msg(
             WsError::InvalidJsonData
         }
     })?;
-    if !event.verify_signature(shared_secret, nonce_cache, nonce_limit) {
+    if !event.verify_signature(shared_secret, nonce_cache).await {
         return Err(WsError::InvalidSignature);
     }
     Ok(event)
