@@ -8,10 +8,8 @@ height="100">
 An open-source [OxideTalis Messaging Protocol][`OTMP`] (OTMP) homeserver
 implementation written in Rust.
 
-<!-- [![Forgejo CI
-Status](https://git.4rs.nl/oxidetalis/oxidetalis/badges/workflows/ci.yml/badge.svg)](https://git.4rs.nl/oxidetalis/oxidetalis)
-[![Forgejo CD
-Status](https://git.4rs.nl/oxidetalis/oxidetalis/badges/workflows/cd.yml/badge.svg)](https://git.4rs.nl/oxidetalis/oxidetalis) -->
+[![Forgejo CI Status](https://git.4rs.nl/oxidetalis/oxidetalis/badges/workflows/ci.yml/badge.svg)](https://git.4rs.nl/oxidetalis/oxidetalis)
+[![Forgejo CD Status](https://git.4rs.nl/oxidetalis/oxidetalis/badges/workflows/cd.yml/badge.svg)](https://git.4rs.nl/oxidetalis/oxidetalis)
 
 [![agplv3-or-later](https://www.gnu.org/graphics/agplv3-88x31.png)](https://www.gnu.org/licenses/agpl-3.0.html)
 
@@ -78,6 +76,10 @@ docker-compose up -d
 ## Contributing
 For information on how to contribute to the project, please see the
 [CONTRIBUTING.md](./CONTRIBUTING.md) file.
+
+## Repository mirrors
+- [Codeberg](https://codeberg.org/awiteb/oxidetalis)
+- [GitHub](https://github.com/oxidetalis/oxidetalis)
 
 ## Licenses
 The project is split into multiple crates, each with its own license:
