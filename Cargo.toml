@@ -27,4 +27,8 @@ salvo_core = { version = "0.68.3", default-features = false, features = ["rustls
 salvo-oapi = { version = "0.68.3", default-features = false, features = ["rapidoc","redoc","scalar","swagger-ui"] }
 
 [profile.release]
-strip = true # Automatically strip symbols from the binary.
+strip = true
+panic = "abort"
+codegen-units = 1
+lto = true
+
