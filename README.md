@@ -15,7 +15,8 @@ implementation written in Rust.
 
 </div>
 
-> [!WARNING]
+> **Warning**
+>
 > The project is still in very early development and is not ready for
 > any kind of use yet, the protocol is not finalized and the server is not
 > feature complete, also not all protocol features are implemented yet.
@@ -63,7 +64,8 @@ read it.
 
 ## Running the server
 
-> [!NOTE]
+> **Note**
+>
 > You must update `OXIDETALIS_CONFIG` in the `docker-compose.yml` file to point
 > to the correct configuration file. And you must update the configuration file.
 
