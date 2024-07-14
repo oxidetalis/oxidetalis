@@ -122,6 +122,55 @@ ensures that the code meets the project's standards and maintains its quality.
 Please be open to feedback and suggestions from the project maintainers during
 the code review process.
 
+## Maintainers
+As a maintainer, after approving a PR, you need to pull the PR locally and then merge it manually.
+
+Why? Because Forgejo add some trailers to the commit message, so you need to merge it manually.
+
+### Pull the PR
+```bash
+# Replace {{pr-number}} with the PR number
+git fetch origin +refs/pull/{{pr-number}}/head:refs/heads/pr-{{pr-number}}
+```
+
+### Merge the PR
+
+There is important trailers you must add it to the commit message, which is:
+- `Signed-off-by: Name <email>`: The name and email of you, the maintainer.
+- `Reviewed-on: pr-url`: The URL of the PR on Forgejo.
+- `Reviewed-by: Name <email>`: The name and email of the reviewer, can be you and other reviewers (each reviewer in a new line).
+- `Co-committed-by: Name <email>`: The name and email of the PR author.
+- `Reported-by: Name <email>`: The name and email of the person who reported the issue (if any bug).
+- `Suggested-by: Name <email>`: The name and email of the person who suggested the feature (if any feature).
+- `Fixes: issue-url`: The URL of the issue that the PR fixes (if any).
+
+Things to note:
+- You can add more than one `Reviewed-by` trailer.
+- You need to make sure to not commit the changes as author, you need to commit it as the author of the PR. you are the committer, not the author.
+- The commit subject must be in the [Conventional Commits] format. To generate the changelog correctly.
+
+```bash
+# Replace {{pr-number}} with the PR number
+git merge --squash pr-{{pr-number}}
+git commit -s --author "Name <email>" -m "feat: Add new feature
+
+Reviewed-on: https://git.4rs.nl/OxideTalis/oxidetalis/pulls/{{pr-number}}
+Reviewed-by: Name <email>
+Co-committed-by: Name <email>
+Reported-by: Name <email>
+"
+```
+
+### Push the changes
+```bash
+git push origin master
+```
+
+### Mark the PR as merged manually
+Copy the full commit hash and mark the PR as merged manually on Forgejo.
+
+That's it! You have merged the PR manually. Thank you for your contribution!
+
 ## License
 
 By contributing to oxidetalis, you agree that your contributions will be
