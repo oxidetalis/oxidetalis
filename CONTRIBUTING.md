@@ -16,6 +16,27 @@ If you have a feature request or an idea for improving oxidetalis, we encourage
 you to open a new issue on the Forgejo repository. Please describe the feature
 or improvement in detail and provide any relevant context or examples.
 
+## Developer Certificate of Origin (DCO)
+Please note that all contributions to oxidetalis must be made under the terms of
+the Developer Certificate of Origin (DCO). This is a legal statement that
+certifies that you have the right to contribute the code and that you agree to
+license it under the project's licenses. Please read the DCO carefully before
+making a contribution, you can find the DCO here [DCO](./DCO).
+
+To indicate that you agree to the terms of the DCO, you can add a
+`Signed-off-by` line to your commit messages. This can be done by adding the
+`-s` flag to the `git commit` command, for example:
+
+```bash
+git commit -s -m "feat: Add new feature"
+```
+
+> **Note**
+>
+> We will not accept contributions that do not include the `Signed-off-by` line
+> in the commit message. We may ask you to re-submit your contribution with the
+> `Signed-off-by` line if it is missing.
+
 ## Writing Code
 Before you start writing code, please open a new issue first to discuss the
 proposed changes. This will help ensure that your contribution is aligned with

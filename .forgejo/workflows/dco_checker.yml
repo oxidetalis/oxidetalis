@@ -1,0 +1,29 @@
+name: DCO checker
+
+on:
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  check:
+    name: DCO checker
+    runs-on: debian
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: DCO checker
+        run: |
+          commits=$(git rev-list origin/master..HEAD)
+          for commit in $commits; do
+              commit_subject=$(git show --quiet --format=%s $commit)
+              commit_sha=$(echo $commit | cut -c1-10)
+              echo "Checking commit $commit_sha \"$commit_subject\""
+              if ! git show --quiet --format=%B $commit | grep -q "Signed-off-by:"; then
+                  author=$(git show --quiet --format=%an $commit)
+                  echo "Commit $commit by $author is missing the 'Signed-off-by:' line"
+                  exit 1
+              fi
+          done
+          echo "All commits have the 'Signed-off-by:' line."
