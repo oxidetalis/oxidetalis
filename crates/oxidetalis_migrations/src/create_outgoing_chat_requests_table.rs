@@ -21,6 +21,8 @@
 
 use sea_orm_migration::prelude::*;
 
+use crate::create_users_table::Users;
+
 #[derive(DeriveMigrationName)]
 pub struct Migration;
 
@@ -30,27 +32,51 @@ impl MigrationTrait for Migration {
         manager
             .create_table(
                 Table::create()
-                    .table(Users::Table)
+                    .table(OutChatRequests::Table)
                     .if_not_exists()
                     .col(
-                        ColumnDef::new(Users::Id)
+                        ColumnDef::new(OutChatRequests::Id)
                             .big_integer()
                             .not_null()
                             .auto_increment()
                             .primary_key(),
                     )
                     .col(
-                        ColumnDef::new(Users::PublicKey)
-                            .string()
-                            .not_null()
-                            .unique_key(),
+                        ColumnDef::new(OutChatRequests::SenderId)
+                            .big_integer()
+                            .not_null(),
+                    )
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("fk-out_chat_requests-users")
+                            .from(OutChatRequests::Table, OutChatRequests::SenderId)
+                            .to(Users::Table, Users::Id)
+                            .on_update(ForeignKeyAction::NoAction)
+                            .on_delete(ForeignKeyAction::Cascade),
                     )
                     .col(
-                        ColumnDef::new(Users::IsAdmin)
-                            .boolean()
-                            .not_null()
-                            .default(false),
+                        ColumnDef::new(OutChatRequests::Recipient)
+                            .string()
+                            .not_null(),
                     )
+                    .col(
+                        ColumnDef::new(OutChatRequests::OutOn)
+                            .timestamp_with_time_zone()
+                            .not_null(),
+                    )
+                    .to_owned(),
+            )
+            .await?;
+
+        manager
+            .create_index(
+                Index::create()
+                    .if_not_exists()
+                    .name("sep_request")
+                    .table(OutChatRequests::Table)
+                    .col(OutChatRequests::SenderId)
+                    .col(OutChatRequests::Recipient)
+                    .unique()
                     .to_owned(),
             )
             .await
@@ -58,9 +84,11 @@ impl MigrationTrait for Migration {
 }
 
 #[derive(DeriveIden)]
-pub enum Users {
+enum OutChatRequests {
     Table,
     Id,
-    PublicKey,
-    IsAdmin,
+    SenderId,
+    /// Public key of the recipient
+    Recipient,
+    OutOn,
 }

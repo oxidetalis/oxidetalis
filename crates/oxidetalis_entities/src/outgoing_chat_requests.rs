@@ -19,47 +19,39 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-pub use sea_orm::{
-    ActiveModelTrait,
-    ColumnTrait,
-    EntityOrSelect,
-    EntityTrait,
-    IntoActiveModel,
-    ModelTrait,
-    Order,
-    PaginatorTrait,
-    QueryFilter,
-    QueryOrder,
-    QuerySelect,
-    Set,
-    SqlErr,
-};
+use chrono::Utc;
+use sea_orm::entity::prelude::*;
 
-/// User ID type
-pub type UserId = i64;
+use crate::prelude::*;
 
-pub use super::incoming_chat_requests::{
-    ActiveModel as InChatRequestsActiveModel,
-    Column as InChatRequestsColumn,
-    Entity as InChatRequestsEntity,
-    Model as InChatRequestsModel,
-};
-pub use super::outgoing_chat_requests::{
-    ActiveModel as OutChatRequestsActiveModel,
-    Column as OutChatRequestsColumn,
-    Entity as OutChatRequestsEntity,
-    Model as OutChatRequestsModel,
-};
-pub use super::users::{
-    ActiveModel as UserActiveModel,
-    Column as UserColumn,
-    Entity as UserEntity,
-    Model as UserModel,
-};
-pub use super::users_status::{
-    AccessStatus,
-    ActiveModel as UsersStatusActiveModel,
-    Column as UsersStatusColumn,
-    Entity as UsersStatusEntity,
-    Model as UsersStatusModel,
-};
+#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
+#[sea_orm(table_name = "out_chat_requests")]
+pub struct Model {
+    #[sea_orm(primary_key)]
+    pub id:        UserId,
+    pub sender_id: UserId,
+    /// Public key of the recipient
+    pub recipient: String,
+    /// The timestamp of the request, when it was sent
+    pub out_on:    chrono::DateTime<Utc>,
+}
+
+#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
+pub enum Relation {
+    #[sea_orm(
+        belongs_to = "UserEntity",
+        from = "Column::SenderId",
+        to = "super::users::Column::Id"
+        on_update = "NoAction",
+        on_delete = "Cascade"
+    )]
+    SenderId,
+}
+
+impl Related<UserEntity> for Entity {
+    fn to() -> RelationDef {
+        Relation::SenderId.def()
+    }
+}
+
+impl ActiveModelBehavior for ActiveModel {}

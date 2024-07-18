@@ -21,6 +21,8 @@
 
 use sea_orm_migration::prelude::*;
 
+use crate::create_users_table::Users;
+
 #[derive(DeriveMigrationName)]
 pub struct Migration;
 
@@ -30,27 +32,46 @@ impl MigrationTrait for Migration {
         manager
             .create_table(
                 Table::create()
-                    .table(Users::Table)
+                    .table(InChatRequests::Table)
                     .if_not_exists()
                     .col(
-                        ColumnDef::new(Users::Id)
+                        ColumnDef::new(InChatRequests::Id)
                             .big_integer()
                             .not_null()
                             .auto_increment()
                             .primary_key(),
                     )
                     .col(
-                        ColumnDef::new(Users::PublicKey)
-                            .string()
-                            .not_null()
-                            .unique_key(),
+                        ColumnDef::new(InChatRequests::RecipientId)
+                            .big_integer()
+                            .not_null(),
                     )
+                    .foreign_key(
+                        ForeignKey::create()
+                            .name("fk-in_chat_requests-users")
+                            .from(InChatRequests::Table, InChatRequests::RecipientId)
+                            .to(Users::Table, Users::Id)
+                            .on_update(ForeignKeyAction::NoAction)
+                            .on_delete(ForeignKeyAction::Cascade),
+                    )
+                    .col(ColumnDef::new(InChatRequests::Sender).string().not_null())
                     .col(
-                        ColumnDef::new(Users::IsAdmin)
-                            .boolean()
-                            .not_null()
-                            .default(false),
+                        ColumnDef::new(InChatRequests::InOn)
+                            .timestamp_with_time_zone()
+                            .not_null(),
                     )
+                    .to_owned(),
+            )
+            .await?;
+        manager
+            .create_index(
+                Index::create()
+                    .if_not_exists()
+                    .name("sep_request")
+                    .table(InChatRequests::Table)
+                    .col(InChatRequests::RecipientId)
+                    .col(InChatRequests::Sender)
+                    .unique()
                     .to_owned(),
             )
             .await
@@ -58,9 +79,11 @@ impl MigrationTrait for Migration {
 }
 
 #[derive(DeriveIden)]
-pub enum Users {
+enum InChatRequests {
     Table,
     Id,
-    PublicKey,
-    IsAdmin,
+    RecipientId,
+    /// Public key of the sender
+    Sender,
+    InOn,
 }

@@ -19,47 +19,48 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-pub use sea_orm::{
-    ActiveModelTrait,
-    ColumnTrait,
-    EntityOrSelect,
-    EntityTrait,
-    IntoActiveModel,
-    ModelTrait,
-    Order,
-    PaginatorTrait,
-    QueryFilter,
-    QueryOrder,
-    QuerySelect,
-    Set,
-    SqlErr,
-};
+use chrono::Utc;
+use sea_orm::entity::prelude::*;
 
-/// User ID type
-pub type UserId = i64;
+use crate::prelude::*;
 
-pub use super::incoming_chat_requests::{
-    ActiveModel as InChatRequestsActiveModel,
-    Column as InChatRequestsColumn,
-    Entity as InChatRequestsEntity,
-    Model as InChatRequestsModel,
-};
-pub use super::outgoing_chat_requests::{
-    ActiveModel as OutChatRequestsActiveModel,
-    Column as OutChatRequestsColumn,
-    Entity as OutChatRequestsEntity,
-    Model as OutChatRequestsModel,
-};
-pub use super::users::{
-    ActiveModel as UserActiveModel,
-    Column as UserColumn,
-    Entity as UserEntity,
-    Model as UserModel,
-};
-pub use super::users_status::{
-    AccessStatus,
-    ActiveModel as UsersStatusActiveModel,
-    Column as UsersStatusColumn,
-    Entity as UsersStatusEntity,
-    Model as UsersStatusModel,
-};
+#[derive(Debug, Clone, Eq, PartialEq, EnumIter, DeriveActiveEnum)]
+#[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "access_status")]
+pub enum AccessStatus {
+    #[sea_orm(string_value = "whitelisted")]
+    Whitelisted,
+    #[sea_orm(string_value = "blacklisted")]
+    Blacklisted,
+}
+
+#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
+#[sea_orm(table_name = "users_status")]
+pub struct Model {
+    #[sea_orm(primary_key)]
+    pub id:         UserId,
+    pub user_id:    UserId,
+    /// Public key of the target
+    pub target:     String,
+    pub status:     AccessStatus,
+    pub updated_at: chrono::DateTime<Utc>,
+}
+
+#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
+pub enum Relation {
+    #[sea_orm(
+        belongs_to = "UserEntity",
+        from = "Column::UserId",
+        to = "super::users::Column::Id"
+        on_update = "NoAction",
+        on_delete = "Cascade"
+    )]
+    UserId,
+}
+
+impl Related<UserEntity> for Entity {
+    fn to() -> RelationDef {
+        Relation::UserId.def()
+    }
+}
+
+impl ActiveModelBehavior for ActiveModel {}

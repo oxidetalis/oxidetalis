@@ -19,5 +19,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+pub mod incoming_chat_requests;
+pub mod outgoing_chat_requests;
 pub mod prelude;
 pub mod users;
+pub mod users_status;

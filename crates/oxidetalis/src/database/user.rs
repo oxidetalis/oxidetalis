@@ -21,27 +21,29 @@ use oxidetalis_core::types::PublicKey;
 use oxidetalis_entities::prelude::*;
 use sea_orm::DatabaseConnection;
 
-use crate::errors::{ApiError, ApiResult};
+use crate::{errors::ServerResult, routes::ApiError};
 
 pub trait UserTableExt {
     /// Returns true if there is users in the database
-    async fn users_exists_in_database(&self) -> ApiResult<bool>;
+    async fn users_exists_in_database(&self) -> ServerResult<bool>;
     /// Register new user
-    async fn register_user(&self, public_key: &PublicKey, is_admin: bool) -> ApiResult<()>;
+    async fn register_user(&self, public_key: &PublicKey, is_admin: bool) -> ServerResult<()>;
+    /// Returns user by its public key
+    async fn get_user_by_pubk(&self, public_key: &PublicKey) -> ServerResult<Option<UserModel>>;
 }
 
 impl UserTableExt for DatabaseConnection {
     #[logcall]
-    async fn users_exists_in_database(&self) -> ApiResult<bool> {
+    async fn users_exists_in_database(&self) -> ServerResult<bool> {
         UserEntity::find()
             .one(self)
             .await
-            .map_err(Into::into)
             .map(|u| u.is_some())
+            .map_err(Into::into)
     }
 
     #[logcall]
-    async fn register_user(&self, public_key: &PublicKey, is_admin: bool) -> ApiResult<()> {
+    async fn register_user(&self, public_key: &PublicKey, is_admin: bool) -> ServerResult<()> {
         if let Err(err) = (UserActiveModel {
             public_key: Set(public_key.to_string()),
             is_admin: Set(is_admin),
@@ -51,10 +53,19 @@ impl UserTableExt for DatabaseConnection {
         .await
         {
             if let Some(SqlErr::UniqueConstraintViolation(_)) = err.sql_err() {
-                return Err(ApiError::DuplicatedUser);
+                return Err(ApiError::AlreadyRegistered.into());
             }
         }
 
         Ok(())
+    }
+
+    #[logcall]
+    async fn get_user_by_pubk(&self, public_key: &PublicKey) -> ServerResult<Option<UserModel>> {
+        UserEntity::find()
+            .filter(UserColumn::PublicKey.eq(public_key.to_string()))
+            .one(self)
+            .await
+            .map_err(Into::into)
     }
 }

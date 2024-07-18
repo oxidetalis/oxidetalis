@@ -18,20 +18,21 @@ use std::sync::Arc;
 
 use chrono::Utc;
 use oxidetalis_config::Config;
+use oxidetalis_core::types::PublicKey;
 use rayon::iter::{IntoParallelRefMutIterator, ParallelIterator};
-use salvo::{websocket::Message, Depot};
+use salvo::Depot;
 use sea_orm::DatabaseConnection;
 use uuid::Uuid;
 
 use crate::{
     nonce::NonceCache,
-    websocket::{OnlineUsers, ServerEvent, SocketUserData},
+    websocket::{OnlineUsers, ServerEvent, SocketUserData, Unsigned},
 };
 
 /// Extension trait for the Depot.
 pub trait DepotExt {
     /// Returns the database connection
-    fn db_conn(&self) -> &DatabaseConnection;
+    fn db_conn(&self) -> Arc<DatabaseConnection>;
     /// Returns the server configuration
     fn config(&self) -> &Config;
     /// Retutns the nonce cache
@@ -54,12 +55,20 @@ pub trait OnlineUsersExt {
 
     /// Disconnect inactive users (who not respond for the ping event)
     async fn disconnect_inactive_users(&self);
+
+    /// Returns the connection id of the user, if it is online
+    async fn is_online(&self, public_key: &PublicKey) -> Option<Uuid>;
+
+    /// Send an event to user by connection id
+    async fn send(&self, conn_id: &Uuid, event: ServerEvent<Unsigned>);
 }
 
 impl DepotExt for Depot {
-    fn db_conn(&self) -> &DatabaseConnection {
-        self.obtain::<Arc<DatabaseConnection>>()
-            .expect("Database connection not found")
+    fn db_conn(&self) -> Arc<DatabaseConnection> {
+        Arc::clone(
+            self.obtain::<Arc<DatabaseConnection>>()
+                .expect("Database connection not found"),
+        )
     }
 
     fn config(&self) -> &Config {
@@ -87,9 +96,10 @@ impl OnlineUsersExt for OnlineUsers {
         let now = Utc::now();
         self.write().await.par_iter_mut().for_each(|(_, u)| {
             u.pinged_at = now;
-            let _ = u.sender.unbounded_send(Ok(Message::from(
-                &ServerEvent::ping().sign(&u.shared_secret),
-            )));
+            let _ = u.sender.unbounded_send(Ok(ServerEvent::ping()
+                .sign(&u.shared_secret)
+                .as_ref()
+                .into()));
         });
     }
 
@@ -109,5 +119,21 @@ impl OnlineUsersExt for OnlineUsers {
             }
             true
         });
+    }
+
+    async fn is_online(&self, public_key: &PublicKey) -> Option<Uuid> {
+        self.read()
+            .await
+            .iter()
+            .find(|(_, u)| &u.public_key == public_key)
+            .map(|(c, _)| *c)
+    }
+
+    async fn send(&self, conn_id: &Uuid, event: ServerEvent<Unsigned>) {
+        if let Some(user) = self.read().await.get(conn_id) {
+            let _ = user
+                .sender
+                .unbounded_send(Ok(event.sign(&user.shared_secret).as_ref().into()));
+        }
     }
 }

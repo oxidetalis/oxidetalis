@@ -14,14 +14,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://gnu.org/licenses/agpl-3.0>.
 
-//! Database utilities for the OxideTalis homeserver.
+//! Set of route parameters for the API
 
-mod in_chat_requests;
-mod out_chat_requests;
-mod user;
-mod user_status;
+mod pagination;
 
-pub use in_chat_requests::*;
-pub use out_chat_requests::*;
-pub use user::*;
-pub use user_status::*;
+pub use pagination::*;

@@ -14,7 +14,11 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://gnu.org/licenses/agpl-3.0>.
 
+use std::str::FromStr;
+
+use chrono::{DateTime, Utc};
 use oxidetalis_core::{cipher::K256Secret, types::PublicKey};
+use oxidetalis_entities::prelude::*;
 use salvo::oapi::ToSchema;
 use serde::{Deserialize, Serialize};
 
@@ -24,4 +28,58 @@ use serde::{Deserialize, Serialize};
 pub struct RegisterUserBody {
     /// The public key of the user
     pub public_key: PublicKey,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, ToSchema, derive_new::new)]
+#[salvo(schema(name = WhiteListedUser, example = json!(WhiteListedUser::default())))]
+pub struct WhiteListedUser {
+    /// User's public key
+    pub public_key:     PublicKey,
+    /// When the user was whitelisted
+    pub whitelisted_at: DateTime<Utc>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, ToSchema, derive_new::new)]
+#[salvo(schema(name = BlackListedUser, example = json!(BlackListedUser::default())))]
+pub struct BlackListedUser {
+    /// User's public key
+    pub public_key:     PublicKey,
+    /// When the user was blacklisted
+    pub blacklisted_at: DateTime<Utc>,
+}
+
+impl Default for WhiteListedUser {
+    fn default() -> Self {
+        WhiteListedUser::new(
+            PublicKey::from_str("bYhbrm61ov8GLZfskUYbsCLJTfaacMsuTBYgBABEH9dy").expect("is valid"),
+            Utc::now(),
+        )
+    }
+}
+
+impl From<UsersStatusModel> for WhiteListedUser {
+    fn from(user: UsersStatusModel) -> Self {
+        Self {
+            public_key:     PublicKey::from_str(&user.target).expect("Is valid public key"),
+            whitelisted_at: user.updated_at,
+        }
+    }
+}
+
+impl Default for BlackListedUser {
+    fn default() -> Self {
+        BlackListedUser::new(
+            PublicKey::from_str("bYhbrm61ov8GLZfskUYbsCLJTfaacMsuTBYgBABEH9dy").expect("is valid"),
+            Utc::now(),
+        )
+    }
+}
+
+impl From<UsersStatusModel> for BlackListedUser {
+    fn from(user: UsersStatusModel) -> Self {
+        Self {
+            public_key:     PublicKey::from_str(&user.target).expect("Is valid public key"),
+            blacklisted_at: user.updated_at,
+        }
+    }
 }

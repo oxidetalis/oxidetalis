@@ -27,7 +27,10 @@ use crate::nonce::NonceCache;
 use crate::schemas::MessageSchema;
 use crate::{middlewares, websocket};
 
+mod errors;
 mod user;
+
+pub use errors::*;
 
 pub fn write_json_body(res: &mut Response, json_body: impl serde::Serialize) {
     res.write_body(serde_json::to_string(&json_body).expect("Json serialization can't be fail"))

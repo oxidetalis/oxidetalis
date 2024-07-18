@@ -16,7 +16,7 @@
 
 //! Events that the client send it
 
-use oxidetalis_core::types::Signature;
+use oxidetalis_core::types::{PublicKey, Signature};
 use serde::{Deserialize, Serialize};
 
 use crate::{nonce::NonceCache, utils};
@@ -24,9 +24,13 @@ use crate::{nonce::NonceCache, utils};
 /// Client websocket event
 #[derive(Deserialize, Clone, Debug)]
 pub struct ClientEvent {
+    #[serde(flatten)]
     pub event: ClientEventType,
     signature: Signature,
 }
+
+// ## Important for contuributors
+// Please make sure to order the event data alphabetically.
 
 /// Client websocket event type
 #[derive(Serialize, Deserialize, Clone, Eq, PartialEq, Debug)]
@@ -36,6 +40,10 @@ pub enum ClientEventType {
     Ping { timestamp: u64 },
     /// Pong event
     Pong { timestamp: u64 },
+    /// Request to chat with a user
+    ChatRequest { to: PublicKey },
+    /// Response to a chat request
+    ChatRequestResponse { accepted: bool, to: PublicKey },
 }
 
 impl ClientEventType {

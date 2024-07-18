@@ -14,24 +14,16 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://gnu.org/licenses/agpl-3.0>.
 
-use salvo::{
-    http::StatusCode,
-    oapi::{Components as OapiComponents, EndpointOutRegister, Operation as OapiOperation},
-    Response,
-    Scribe,
-};
+use sea_orm::DbErr;
 
-use crate::{routes::write_json_body, schemas::MessageSchema};
+use crate::{routes::ApiError, websocket::errors::WsError};
 
 /// Result type of the homeserver
-#[allow(clippy::absolute_paths)]
-pub(crate) type Result<T> = std::result::Result<T, Error>;
-#[allow(clippy::absolute_paths)]
-pub type ApiResult<T> = std::result::Result<T, ApiError>;
+pub(crate) type ServerResult<T> = Result<T, ServerError>;
 
 /// The homeserver errors
 #[derive(Debug, thiserror::Error)]
-pub(crate) enum Error {
+pub enum InternalError {
     #[error("Database Error: {0}")]
     Database(#[from] sea_orm::DbErr),
     #[error("{0}")]
@@ -39,43 +31,41 @@ pub(crate) enum Error {
 }
 
 #[derive(Debug, thiserror::Error)]
-pub enum ApiError {
-    /// Error from the database (500 Internal Server Error)
-    #[error("Internal server error")]
-    SeaOrm(#[from] sea_orm::DbErr),
-    /// The server registration is closed (403 Forbidden)
-    #[error("Server registration is closed")]
-    RegistrationClosed,
-    /// The entered public key is already registered (400 Bad Request)
-    #[error("The entered public key is already registered")]
-    DuplicatedUser,
-    /// The user entered two different public keys
-    /// one in the header and other in the request body
-    /// (400 Bad Request)
-    #[error("You entered two different public keys")]
-    TwoDifferentKeys,
+/// The homeserver errors
+pub enum ServerError {
+    /// Internal server error, should not be exposed to the user
+    #[error("{0}")]
+    Internal(#[from] InternalError),
+    /// API error, errors happening in the API
+    #[error("{0}")]
+    Api(#[from] ApiError),
+    /// WebSocket error, errors happening in the WebSocket
+    #[error("{0}")]
+    Ws(#[from] WsError),
 }
 
-impl ApiError {
-    /// Status code of the error
-    pub const fn status_code(&self) -> StatusCode {
-        match self {
-            Self::SeaOrm(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            Self::RegistrationClosed => StatusCode::FORBIDDEN,
-            Self::DuplicatedUser | Self::TwoDifferentKeys => StatusCode::BAD_REQUEST,
+impl From<DbErr> for ServerError {
+    fn from(err: DbErr) -> Self {
+        Self::Internal(err.into())
+    }
+}
+
+impl From<ServerError> for WsError {
+    fn from(err: ServerError) -> Self {
+        match err {
+            ServerError::Api(ApiError::NotRegisteredUser) => WsError::RegistredUserEvent,
+            ServerError::Internal(_) | ServerError::Api(_) => WsError::InternalServerError,
+            ServerError::Ws(err) => err,
         }
     }
 }
 
-impl EndpointOutRegister for ApiError {
-    fn register(_: &mut OapiComponents, _: &mut OapiOperation) {}
-}
-
-impl Scribe for ApiError {
-    fn render(self, res: &mut Response) {
-        log::error!("Error: {self}");
-
-        res.status_code(self.status_code());
-        write_json_body(res, MessageSchema::new(self.to_string()));
+impl From<ServerError> for ApiError {
+    fn from(err: ServerError) -> Self {
+        match err {
+            ServerError::Ws(WsError::RegistredUserEvent) => ApiError::NotRegisteredUser,
+            ServerError::Internal(_) | ServerError::Ws(_) => ApiError::Internal,
+            ServerError::Api(err) => err,
+        }
     }
 }

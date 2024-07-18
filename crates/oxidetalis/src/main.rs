@@ -19,6 +19,7 @@
 
 use std::process::ExitCode;
 
+use errors::ServerError;
 use oxidetalis_config::{CliArgs, Parser};
 use oxidetalis_migrations::MigratorTrait;
 use salvo::{conn::TcpListener, Listener, Server};
@@ -26,18 +27,21 @@ use salvo::{conn::TcpListener, Listener, Server};
 mod database;
 mod errors;
 mod extensions;
+mod macros;
 mod middlewares;
 mod nonce;
+mod parameters;
 mod routes;
 mod schemas;
 mod utils;
 mod websocket;
 
-async fn try_main() -> errors::Result<()> {
+async fn try_main() -> errors::ServerResult<()> {
     pretty_env_logger::init_timed();
 
     log::info!("Parsing configuration");
-    let config = oxidetalis_config::Config::load(CliArgs::parse())?;
+    let config = oxidetalis_config::Config::load(CliArgs::parse())
+        .map_err(|err| ServerError::Internal(err.into()))?;
     log::info!("Configuration parsed successfully");
     log::info!("Connecting to the database");
     let connection = sea_orm::Database::connect(utils::postgres_url(&config.postgresdb)).await?;

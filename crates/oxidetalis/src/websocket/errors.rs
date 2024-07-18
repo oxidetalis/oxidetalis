@@ -16,42 +16,27 @@
 
 //! Websocket errors
 
+use crate::ws_errors;
+
 /// Result type of websocket
 pub type WsResult<T> = Result<T, WsError>;
 
-/// Websocket errors, returned in the websocket communication
-#[derive(Debug)]
-pub enum WsError {
-    /// The signature is invalid
-    InvalidSignature,
-    /// Message type must be text
-    NotTextMessage,
-    /// Invalid json data
-    InvalidJsonData,
-    /// Unknown client event
-    UnknownClientEvent,
-}
-
-impl WsError {
-    /// Returns error name
-    pub const fn name(&self) -> &'static str {
-        match self {
-            WsError::InvalidSignature => "InvalidSignature",
-            WsError::NotTextMessage => "NotTextMessage",
-            WsError::InvalidJsonData => "InvalidJsonData",
-            WsError::UnknownClientEvent => "UnknownClientEvent",
-        }
-    }
-
-    /// Returns the error reason
-    pub const fn reason(&self) -> &'static str {
-        match self {
-            WsError::InvalidSignature => "Invalid event signature",
-            WsError::NotTextMessage => "The websocket message must be text message",
-            WsError::InvalidJsonData => "Received invalid json data, the text must be valid json",
-            WsError::UnknownClientEvent => {
-                "Unknown client event, the event is not recognized by the server"
-            }
-        }
-    }
+ws_errors! {
+    InternalServerError = "Internal server error",
+    InvalidSignature = "Invalid event signature",
+    NotTextMessage = "The websocket message must be text message",
+    InvalidJsonData = "Received invalid json data, the text must be valid json",
+    UnknownClientEvent = "Unknown client event, the event is not recognized by the server",
+    RegistredUserEvent = "The event is only for registred users",
+    UserNotFound = "The user is not registered in the server",
+    AlreadyOnTheWhitelist = "The user is already on your whitelist",
+    CannotAddSelfToWhitelist = "You cannot add yourself to the whitelist",
+    AlreadyOnTheBlacklist = "The user is already on your blacklist",
+    CannotAddSelfToBlacklist = "You cannot add yourself to the blacklist",
+    AlreadySendChatRequest = "You have already sent a chat request to this user",
+    CannotSendChatRequestToSelf = "You cannot send a chat request to yourself",
+    CannotRespondToOwnChatRequest = "You cannot respond to your own chat request",
+    NoChatRequestFromRecipient = "You do not have a chat request from the recipient",
+    RecipientBlacklist = "You cannot send a chat request because you are on the recipient's blacklist.",
+    AlreadyInRecipientWhitelist = "You are already on the recipient's whitelist and can chat with them."
 }

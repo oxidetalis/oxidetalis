@@ -19,7 +19,10 @@
 use std::marker::PhantomData;
 
 use chrono::Utc;
-use oxidetalis_core::{cipher::K256Secret, types::Signature};
+use oxidetalis_core::{
+    cipher::K256Secret,
+    types::{PublicKey, Signature},
+};
 use salvo::websocket::Message;
 use serde::Serialize;
 
@@ -28,6 +31,7 @@ use crate::websocket::errors::WsError;
 /// Signed marker, used to indicate that the event is signed
 pub struct Signed;
 /// Unsigned marker, used to indicate that the event is unsigned
+#[derive(Debug)]
 pub struct Unsigned;
 
 /// Server websocket event
@@ -42,12 +46,16 @@ pub struct ServerEvent<T> {
 
 /// server websocket event type
 #[derive(Serialize, Clone, Eq, PartialEq, Debug)]
-#[serde(rename_all = "PascalCase")]
+#[serde(rename_all = "PascalCase", tag = "event", content = "data")]
 pub enum ServerEventType {
     /// Ping event
     Ping { timestamp: u64 },
     /// Pong event
     Pong { timestamp: u64 },
+    /// New chat request from someone
+    ChatRequest { from: PublicKey },
+    /// New chat request response from someone
+    ChatRequestResponse { accepted: bool, from: PublicKey },
     /// Error event
     Error {
         name:   &'static str,
@@ -88,6 +96,16 @@ impl ServerEvent<Unsigned> {
         })
     }
 
+    /// Create chat request event
+    pub fn chat_request(from: &PublicKey) -> Self {
+        Self::new(ServerEventType::ChatRequest { from: *from })
+    }
+
+    /// Create chat request response event
+    pub fn chat_request_response(from: PublicKey, accepted: bool) -> Self {
+        Self::new(ServerEventType::ChatRequestResponse { from, accepted })
+    }
+
     /// Sign the event
     pub fn sign(self, shared_secret: &[u8; 32]) -> ServerEvent<Signed> {
         ServerEvent::<Signed> {
@@ -98,6 +116,12 @@ impl ServerEvent<Unsigned> {
             event:     self.event,
             phantom:   PhantomData,
         }
+    }
+}
+
+impl<S> AsRef<Self> for ServerEvent<S> {
+    fn as_ref(&self) -> &Self {
+        self
     }
 }
 
