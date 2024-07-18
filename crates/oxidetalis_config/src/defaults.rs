@@ -72,10 +72,10 @@ pub(crate) mod openapi {
         "/openapi.json".to_owned()
     }
     pub const fn viewer() -> types::OpenApiViewer {
-        types::OpenApiViewer::SwaggerUi
+        types::OpenApiViewer::Scalar
     }
     pub fn viewer_path() -> String {
-        "/swagger-ui".to_owned()
+        "/scalar-ui".to_owned()
     }
 }
 
