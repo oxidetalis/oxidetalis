@@ -6,15 +6,21 @@ contributions from the community to help improve the project.
 ## Reporting Issues
 
 If you encounter any issues or bugs while using oxidetalis, please open a new
-issue on the Forgejo repository. When reporting an issue, please provide as much
+issue on our [issue tracker][issue-tracker]. When reporting an issue, please provide as much
 detail as possible, including steps to reproduce the issue and any relevant
 error messages.
 
 ## Feature Requests
 
 If you have a feature request or an idea for improving oxidetalis, we encourage
-you to open a new issue on the Forgejo repository. Please describe the feature
-or improvement in detail and provide any relevant context or examples.
+you to open a new issue on our [issue tracker][issue-tracker]. Please describe the feature or
+improvement in detail and provide any relevant context or examples.
+
+## Contributors list
+
+We have a list of contributors in the `CONTRIBUTORS.md` file. If your email is
+public, we will add you to the list. If you don't want to be added, please let
+us know.
 
 ## Developer Certificate of Origin (DCO)
 Please note that all contributions to oxidetalis must be made under the terms of
@@ -38,10 +44,14 @@ git commit -s -m "feat: Add new feature"
 > `Signed-off-by` line if it is missing.
 
 ## Writing Code
-Before you start writing code, please open a new issue first to discuss the
-proposed changes. This will help ensure that your contribution is aligned with
-the project's goals and that you are not duplicating work that is already in
-progress or has been completed by someone else.
+Before you start writing code, please open a new [issue][issue-tracker] first to
+discuss the proposed changes. This will help ensure that your contribution is
+aligned with the project's goals and that you are not duplicating work that is
+already in progress or has been completed by someone else.
+
+After your issue has confirmed, you can start writing code. then open your PR at
+our [Forgejo](https://git.4rs.nl/OxideTalis/oxidetalis/pulls) instance and
+follow the guidelines below.
 
 ### Rust Version
 In the oxidetalis project, we always try to stay on the lowest MSRV possible for
@@ -181,3 +191,4 @@ contribution.
 Happy contributing!
 
 [Conventional Commits]: https://www.conventionalcommits.org/en/v1.0.0/
+[issue-tracker]: https://git.4rs.nl/OxideTalis/oxidetalis/issues
