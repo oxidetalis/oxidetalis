@@ -22,15 +22,14 @@ implementation written in Rust.
 > feature complete, also not all protocol features are implemented yet.
 
 ## About
-[`OTMP`] is a federated chat protocol that aims to be a secure and
-privacy-respecting alternative to existing chat protocols, [`OTMP`] does not
-rely on a central server, but instead uses a federated network of servers to
-deliver messages. When you send a message to a friend, you will connect to your
-friend's server and send the message directly to them. This way, your messages
-are not stored on a central server, and only you and your friend can read them.
+[`OTMP`] is a decentralized, end-to-end encrypted chat protocol designed to
+prioritize privacy. Unlike existing chat protocols, [`OTMP`] operates without a
+central server. When you send a message, it connects directly to your friend's
+server, ensuring that your messages are not stored centrally. Only you and your
+friend can read the messages, even your servers cannot access their content.
 
 ## Key Features
-- **Federated**: No central server, messages are sent directly to the recipient server by you.
+- **Decentralized**: No central server, messages are sent directly to the recipient server by you.
 - **End-to-End Encryption**: Messages are encrypted on the client and decrypted
   on the client.
 - **Self-Hosted**: You can host your own server and have full control over your
