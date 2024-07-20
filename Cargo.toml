@@ -3,7 +3,7 @@ members = ["crates/*"]
 resolver = "2"
 
 [workspace.package]
-authors = ["OxideTalis Developers <otmp@4rs.nl>"]
+authors = ["Awiteb <a@4rs.nl>", "OxideTalis Contributors"]
 readme = "README.md"
 repository = "https://git.4rs.nl/oxidetalis/oxidetalis"
 version = "0.1.0"

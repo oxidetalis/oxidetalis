@@ -1,5 +1,5 @@
 // OxideTalis Messaging Protocol homeserver core implementation
-// Copyright (c) 2024 OxideTalis Developers <otmp@4rs.nl>
+// Copyright (C) 2024 Awiteb <a@4rs.nl>, OxideTalis Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal

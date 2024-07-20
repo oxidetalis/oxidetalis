@@ -1,5 +1,5 @@
 // OxideTalis Messaging Protocol homeserver implementation
-// Copyright (C) 2024 OxideTalis Developers <otmp@4rs.nl>
+// Copyright (C) 2024 Awiteb <a@4rs.nl>, OxideTalis Contributors
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as
