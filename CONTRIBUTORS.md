@@ -21,6 +21,12 @@ and improvements.
 
 - Amjad Alsharafi <me@amjad.alsharafi.dev>
 
+## Bug Reporters
+Bug reporters have identified and reported bugs in Oxidetalis, helping to
+improve its quality.
+
+- Awiteb <a@4rs.nl>
+
 ## Feature Suggesters
 Feature suggesters have proposed new features to enhance Oxidetalis.
 
