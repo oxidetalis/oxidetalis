@@ -1,7 +1,15 @@
 # Contributing to oxidetalis
 
 Thank you for your interest in contributing to oxidetalis! We welcome
-contributions from the community to help improve the project.
+contributions from the community to help improve OxideTalis and make it even
+better.
+
+## Code of Conduct
+
+We have a [Code of Conduct](./CODE_OF_CONDUCT.md) that we expect all
+contributors to follow. Please read the Code of Conduct before making a
+contribution to OxideTalis. If you encounter any behavior that violates the Code
+of Conduct, please report it to the maintainers at <otmp@4rs.nl>.
 
 ## Reporting Issues
 
@@ -23,6 +31,7 @@ public, we will add you to the list. If you don't want to be added, please let
 us know.
 
 ## Developer Certificate of Origin (DCO)
+
 Please note that all contributions to oxidetalis must be made under the terms of
 the Developer Certificate of Origin (DCO). This is a legal statement that
 certifies that you have the right to contribute the code and that you agree to
@@ -43,7 +52,27 @@ git commit -s -m "feat: Add new feature"
 > in the commit message. We may ask you to re-submit your contribution with the
 > `Signed-off-by` line if it is missing.
 
+## Claiming an issue
+
+If the issue is not assigned to anyone, you can claim it by commenting on the
+issue that you want to work on it. One of the maintainers will then assign the
+issue to you. 
+
+If the issue is already assigned to someone and they have not made any progress
+within two weeks, you can comment that you would like to take over. The
+maintainers will reassign the issue to you if the original assignee agrees or
+does not respond.
+
+Issue assignment operates on a first-come, first-served basis. If you are
+assigned an issue, please ensure you work on it promptly. If you are unable to
+continue for any reason, notify us so we can reassign it to another contributor.
+
+This process helps ensure that issues are addressed promptly and that
+contributors avoid duplicating work or experiencing long wait times for
+responses.
+
 ## Writing Code
+
 Before you start writing code, please open a new [issue][issue-tracker] first to
 discuss the proposed changes. This will help ensure that your contribution is
 aligned with the project's goals and that you are not duplicating work that is
@@ -54,6 +83,7 @@ our [Forgejo](https://git.4rs.nl/OxideTalis/oxidetalis/pulls) instance and
 follow the guidelines below.
 
 ### Rust Version
+
 In the oxidetalis project, we always try to stay on the lowest MSRV possible for
 compatibility, but the development process relies on the nightly release to get
 the latest rust-analyzer and rustfmt features.
@@ -62,6 +92,7 @@ You can check the nightly version used in the project in the `rust-toolchain`
 file. And the MSRV in the `Cargo.toml` file.
 
 ### PR title
+
 Your PR will squash and merge, and your PR title will be used as the commit
 message. Please make sure your PR title is clear and concise.
 
@@ -91,12 +122,14 @@ should be in the following format:
     as documentation generation
 
 #### Example
+
 ```
 - feat: something
 - chore(ci): update MSRV
 ```
 
 ### PR description
+
 Your PR description should provide a clear and concise summary of the changes
 you have made. It should also include any relevant context or background
 information that will help the project maintainers understand the purpose of the
@@ -115,6 +148,7 @@ project. This includes:
 - Adding comments to explain complex logic or algorithms.
 
 ### CI
+
 Run the CI before submitting your code. You can run the CI with the following
 command:
 
@@ -132,12 +166,24 @@ ensures that the code meets the project's standards and maintains its quality.
 Please be open to feedback and suggestions from the project maintainers during
 the code review process.
 
+### Review Process
+
+When you submit your pull request (PR), you can request a review from the maintainers. The PR will be marked as `Waiting On Review` until a maintainer reviews it. There are two possible outcomes:
+
+#### If the PR is approved
+The PR will be marked as `Approved`, and the maintainer will merge it.
+
+#### If the PR is not approved (requested changes)
+The PR will be marked as `Waiting On Author`. You will need to make the requested changes or discuss them with the maintainer. After making the necessary updates, you can request a review again.
+
 ## Maintainers
+
 As a maintainer, after approving a PR, you need to pull the PR locally and then merge it manually.
 
 Why? Because Forgejo add some trailers to the commit message, so you need to merge it manually.
 
 ### Pull the PR
+
 ```bash
 # Replace {{pr-number}} with the PR number
 git fetch origin +refs/pull/{{pr-number}}/head:refs/heads/pr-{{pr-number}}
@@ -172,11 +218,13 @@ Reported-by: Name <email>
 ```
 
 ### Push the changes
+
 ```bash
 git push origin master
 ```
 
 ### Mark the PR as merged manually
+
 Copy the full commit hash and mark the PR as merged manually on Forgejo.
 
 That's it! You have merged the PR manually. Thank you for your contribution!
