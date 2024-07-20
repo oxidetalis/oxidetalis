@@ -28,9 +28,29 @@ use oxidetalis_core::types::Size;
 
 use crate::{types::OpenApiViewer, IpOrUrl};
 
-#[derive(Parser)]
-#[clap(version)]
+/// Header message, used in the help message
+const HEADER: &str = r#"Copyright (C) 2024 Awiteb <a@4rs.nl>, OxideTalis Contributors
+License GNU AGPL-3.0-or-later <https://gnu.org/licenses/agpl-3.0>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+
+Git repository: https://git.4rs.nl/oxidetalis/oxidetalis"#;
+
+/// Footer message, used in the help message
+const FOOTER: &str = r#"Please report bugs to <https://git.4rs.nl/oxidetalis/oxidetalis/issues>."#;
+
 /// Command-line arguments for the Oxidetalis server.
+#[derive(Parser)]
+#[clap(
+    name = "oxidetalis",
+    about = "OTMP homeserver written in Rust",
+    display_name = "oxidetalis",
+    author = "Awiteb <a@4rs.nl>, OxideTalis Contributors",
+    before_long_help = HEADER,
+    after_help = FOOTER,
+    version,
+    disable_colored_help = true
+)]
 pub struct CliArgs {
     /// Path to the configuration file, toml format.
     #[clap(long, env = "OXIDETALIS_CONFIG")]
