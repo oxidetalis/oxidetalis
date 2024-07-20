@@ -37,7 +37,7 @@ pub(crate) mod server {
         IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1))
     }
     pub const fn port() -> u16 {
-        3873
+        7294
     }
     pub fn private_key() -> PrivateKey {
         K256Secret::new().privkey()
