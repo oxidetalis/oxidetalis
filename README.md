@@ -77,7 +77,7 @@ docker-compose up -d
 
 ## Contributing
 For information on how to contribute to the project, please see the
-[CONTRIBUTING.md](./CONTRIBUTING.md) file.
+[CONTRIBUTING.md](./CONTRIBUTING.md) file. You can see the list of contributors in the [CONTRIBUTORS.md](./CONTRIBUTORS.md) file.
 
 ## Repository mirrors
 - [Codeberg](https://codeberg.org/awiteb/oxidetalis)

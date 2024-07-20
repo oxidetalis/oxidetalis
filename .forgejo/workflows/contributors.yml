@@ -1,0 +1,30 @@
+name: Update Contributors
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  update_contributors:
+    name: Update Contributors
+    runs-on: debian
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+      - name: Install just
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to ./bin
+      - name: Update Contributors
+        run: |
+          ./bin/just contributors
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name forgejo-actions
+            git config user.email forgejo-actions@noreply.localhost
+            git add CONTRIBUTORS.md
+            git commit -m "Update CONTRIBUTORS.md"
+            git push
+          else
+            echo "No changes to CONTRIBUTORS.md"
+          fi
