@@ -11,14 +11,14 @@ rust-version.workspace = true
 
 
 [dependencies]
-oxidetalis_core = { workspace = true }
+oxidetalis_core = { workspace = true, features = ["serde"]}
 thiserror       = { workspace = true }
 serde           = { workspace = true }
 log             = { workspace = true }
 salvo_core      = { workspace = true }
 salvo-oapi      = { workspace = true }
+base58          = { workspace = true }
 clap            = { version = "4.5.7", features = ["derive", "env"] }
-base58          = "0.2.0"
 toml            = "0.8.14"
 derivative      = "2.2.0"
 

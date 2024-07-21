@@ -24,7 +24,7 @@
 
 use std::{fmt, str::FromStr};
 
-use logcall::logcall;
+#[cfg(feature = "serde")]
 use serde::{de::Error as DeError, Deserialize, Serialize};
 
 /// Size type. Used to represent sizes in bytes, kilobytes, megabytes, and
@@ -79,7 +79,6 @@ impl fmt::Display for Size {
 impl FromStr for Size {
     type Err = String;
 
-    #[logcall]
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let Some(first_alpha) = s.find(|c: char| c.is_alphabetic()) else {
             return Err("Missing unit, e.g. `2MB`".to_owned());
@@ -103,6 +102,7 @@ impl FromStr for Size {
     }
 }
 
+#[cfg(feature = "serde")]
 impl<'de> Deserialize<'de> for Size {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -115,6 +115,7 @@ impl<'de> Deserialize<'de> for Size {
     }
 }
 
+#[cfg(feature = "serde")]
 impl Serialize for Size {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where

@@ -22,6 +22,7 @@
 //! Oxidetalis server types
 
 mod cipher;
+#[cfg(feature = "serde")]
 mod impl_serde;
 mod size;
 

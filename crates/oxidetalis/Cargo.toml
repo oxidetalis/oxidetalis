@@ -11,7 +11,7 @@ rust-version.workspace = true
 
 
 [dependencies]
-oxidetalis_core       = { workspace = true }
+oxidetalis_core       = { workspace = true, features = ["openapi"]}
 oxidetalis_config     = { workspace = true }
 oxidetalis_entities   = { workspace = true }
 oxidetalis_migrations = { workspace = true }

@@ -22,6 +22,7 @@
 use std::{fmt, str::FromStr};
 
 use base58::{FromBase58, ToBase58};
+#[cfg(feature = "openapi")]
 use salvo_oapi::{
     schema::{
         Schema as OapiSchema,
@@ -204,6 +205,7 @@ impl From<[u8; 56]> for Signature {
     }
 }
 
+#[cfg(feature = "openapi")]
 impl ToSchema for PublicKey {
     fn to_schema(_components: &mut salvo_oapi::Components) -> salvo_oapi::RefOr<OapiSchema> {
         salvo_oapi::Object::new()
@@ -213,6 +215,7 @@ impl ToSchema for PublicKey {
     }
 }
 
+#[cfg(feature = "openapi")]
 impl ToSchema for Signature {
     fn to_schema(_components: &mut salvo_oapi::Components) -> salvo_oapi::RefOr<OapiSchema> {
         salvo_oapi::Object::new()
