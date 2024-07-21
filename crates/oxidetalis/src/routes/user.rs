@@ -17,15 +17,7 @@
 //! REST API endpoints for user management
 
 use oxidetalis_core::types::{PublicKey, Signature};
-use salvo::{
-    http::StatusCode,
-    oapi::{endpoint, extract::JsonBody},
-    writing::Json,
-    Depot,
-    Request,
-    Router,
-    Writer,
-};
+use salvo::{http::StatusCode, oapi::endpoint, writing::Json, Depot, Request, Router, Writer};
 
 use super::{ApiError, ApiResult};
 use crate::{
@@ -33,20 +25,22 @@ use crate::{
     extensions::DepotExt,
     middlewares,
     parameters::Pagination,
-    schemas::{BlackListedUser, EmptySchema, MessageSchema, RegisterUserBody, WhiteListedUser},
+    schemas::{BlackListedUser, EmptySchema, MessageSchema, WhiteListedUser},
     utils,
 };
 
+/// (🔓) Register a user
+///
+/// Register the request sender as a user in the server, the server registration
+/// must be open to register a user.
 #[endpoint(
     operation_id = "register",
     tags("User"),
     responses(
         (status_code = 201, description = "User registered"),
-        (status_code = 403, description = "Server registration is closed", content_type = "application/json", body = MessageSchema),
-        (status_code = 400, description = "The public key in the header is not the same as the key in the body", content_type = "application/json", body = MessageSchema),
         (status_code = 400, description = "The entered public key is already registered", content_type = "application/json", body = MessageSchema),
-        (status_code = 401, description = "The entered signature is invalid", content_type = "application/json", body = MessageSchema),
-        (status_code = 401, description = "The entered public key is invalid", content_type = "application/json", body = MessageSchema),
+        (status_code = 401, description = "The entered signature or public key is invalid", content_type = "application/json", body = MessageSchema),
+        (status_code = 403, description = "Server registration is closed", content_type = "application/json", body = MessageSchema),
         (status_code = 429, description = "Too many requests", content_type = "application/json", body = MessageSchema),
         (status_code = 500, description = "Internal server error", content_type = "application/json", body = MessageSchema),
     ),
@@ -55,25 +49,16 @@ use crate::{
         ("X-OTMP-PUBLIC"    = PublicKey, Header, description = "Public key of the sender"),
     ),
 )]
-pub async fn register(
-    body: JsonBody<RegisterUserBody>,
-    req: &Request,
-    depot: &mut Depot,
-) -> ApiResult<EmptySchema> {
-    let body = body.into_inner();
+pub async fn register(req: &Request, depot: &mut Depot) -> ApiResult<EmptySchema> {
     let db = depot.db_conn();
     let config = depot.config();
-
-    if utils::extract_public_key(req).expect("Public key should be checked in the middleware")
-        != body.public_key
-    {
-        return Err(ApiError::TwoDifferentKeys);
-    }
+    let public_key =
+        utils::extract_public_key(req).expect("Public key should be checked in the middleware");
 
     if !db.users_exists_in_database().await? {
-        db.register_user(&body.public_key, true).await?;
+        db.register_user(&public_key, true).await?;
     } else if config.register.enable {
-        db.register_user(&body.public_key, false).await?;
+        db.register_user(&public_key, false).await?;
     } else {
         return Err(ApiError::RegistrationClosed);
     }

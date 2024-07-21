@@ -17,18 +17,10 @@
 use std::str::FromStr;
 
 use chrono::{DateTime, Utc};
-use oxidetalis_core::{cipher::K256Secret, types::PublicKey};
+use oxidetalis_core::types::PublicKey;
 use oxidetalis_entities::prelude::*;
 use salvo::oapi::ToSchema;
 use serde::{Deserialize, Serialize};
-
-/// The schema for the user registration request
-#[derive(Serialize, Deserialize, Clone, Debug, ToSchema, derive_new::new)]
-#[salvo(schema(name = RegisterUserBody, example = json!(RegisterUserBody::new(K256Secret::new().pubkey()))))]
-pub struct RegisterUserBody {
-    /// The public key of the user
-    pub public_key: PublicKey,
-}
 
 #[derive(Serialize, Deserialize, Clone, Debug, ToSchema, derive_new::new)]
 #[salvo(schema(name = WhiteListedUser, example = json!(WhiteListedUser::default())))]

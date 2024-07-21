@@ -36,12 +36,6 @@ pub enum ApiError {
     /// The entered public key is already registered (400 Bad Request)
     #[error("The entered public key is already registered")]
     AlreadyRegistered,
-    /// The user entered two different public keys
-    /// one in the header and other in the request body
-    /// (400 Bad Request)
-    #[error("You entered two different public keys")]
-    TwoDifferentKeys,
-    /// Error in the query parameters (400 Bad Request)
     #[error("{0}")]
     Querys(String),
     /// Non registered user tried to access to registered user only endpoint
@@ -56,9 +50,7 @@ impl ApiError {
         match self {
             Self::Internal => StatusCode::INTERNAL_SERVER_ERROR,
             Self::RegistrationClosed | Self::NotRegisteredUser => StatusCode::FORBIDDEN,
-            Self::AlreadyRegistered | Self::TwoDifferentKeys | Self::Querys(_) => {
-                StatusCode::BAD_REQUEST
-            }
+            Self::AlreadyRegistered | Self::Querys(_) => StatusCode::BAD_REQUEST,
         }
     }
 }
