@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://gnu.org/licenses/agpl-3.0>.
 
-//! Database extension to work with the whitelist table
+//! Database extension for the `users_status` table
 
 use std::num::{NonZeroU32, NonZeroU8};
 
@@ -25,7 +25,7 @@ use sea_orm::DatabaseConnection;
 
 use crate::{errors::ServerResult, websocket::errors::WsError};
 
-/// Extension trait for the `DatabaseConnection` to work with the whitelist
+/// Extension trait for the `DatabaseConnection` to work with the users status
 /// table
 pub trait UsersStatusExt {
     /// Returns true if the `whitelister` has whitelisted the

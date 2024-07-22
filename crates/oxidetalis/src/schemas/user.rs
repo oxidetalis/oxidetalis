@@ -14,6 +14,8 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://gnu.org/licenses/agpl-3.0>.
 
+//! User API schemas
+
 use std::str::FromStr;
 
 use chrono::{DateTime, Utc};

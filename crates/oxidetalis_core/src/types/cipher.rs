@@ -19,6 +19,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+//! Cipher types
+
 use std::{fmt, str::FromStr};
 
 use base58::{FromBase58, ToBase58};

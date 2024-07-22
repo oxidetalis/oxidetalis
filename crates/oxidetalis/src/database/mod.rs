@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://gnu.org/licenses/agpl-3.0>.
 
-//! Database utilities for the OxideTalis homeserver.
+//! Database trait extensions.
 
 mod in_chat_requests;
 mod out_chat_requests;

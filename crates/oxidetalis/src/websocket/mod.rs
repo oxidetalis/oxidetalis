@@ -14,6 +14,9 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program. If not, see <https://gnu.org/licenses/agpl-3.0>.
 
+//! Oxidetalis WebSocket server implementation, handling the WebSocket
+//! connections.
+
 use std::{collections::HashMap, sync::Arc, time::Duration};
 
 use chrono::Utc;

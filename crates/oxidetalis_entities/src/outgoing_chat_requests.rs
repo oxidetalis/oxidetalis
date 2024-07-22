@@ -1,4 +1,4 @@
-// OxideTalis Messaging Protocol homeserver core implementation
+// OxideTalis Messaging Protocol homeserver database entities
 // Copyright (C) 2024 Awiteb <a@4rs.nl>, OxideTalis Contributors
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,6 +18,8 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
+//! Entity for `out_chat_requests` table
 
 use chrono::Utc;
 use sea_orm::entity::prelude::*;

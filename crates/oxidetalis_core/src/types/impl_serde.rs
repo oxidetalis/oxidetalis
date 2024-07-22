@@ -19,6 +19,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+//! Serde serialization and deserialization for types (feature `serde`)
+
 use base58::FromBase58;
 use serde::{de::Error as DeError, Deserialize, Serialize};
 
