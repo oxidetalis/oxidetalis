@@ -21,7 +21,7 @@
 
 //! Oxidetalis config types
 
-use std::{net::IpAddr, str::FromStr};
+use std::{fmt, str::FromStr};
 
 use salvo_oapi::{rapidoc::RapiDoc, redoc::ReDoc, scalar::Scalar, swagger_ui::SwaggerUi};
 use serde::{Deserialize, Serialize};
@@ -39,6 +39,33 @@ pub enum OpenApiViewer {
     Scalar,
     /// Swagger-UI viewer <https://github.com/swagger-api/swagger-ui>
     SwaggerUi,
+}
+
+/// Host type, a wrapper around `url::Host`
+///
+/// Because `url::Host` does not implement `FromStr`, we need to wrap it
+/// in a newtype to implement `FromStr` for it.
+#[derive(Debug, Clone)]
+pub struct Host(pub url::Host);
+
+impl FromStr for Host {
+    type Err = url::ParseError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        // It appears that @SimonSapin prefers not to use the `FromStr` trait.
+        // Instead, he is implementing `parse` without utilizing `FromStr`.
+        //
+        // - <https://github.com/servo/rust-url/pull/18#issuecomment-53467026>
+        // - <https://github.com/servo/rust-url/pull/107#issuecomment-100611345>
+        // - <https://github.com/servo/rust-url/issues/286#issuecomment-284193315>
+        Ok(Self(url::Host::parse(s)?))
+    }
+}
+
+impl fmt::Display for Host {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
 }
 
 impl OpenApiViewer {
@@ -75,52 +102,4 @@ impl OpenApiViewer {
             }
         }
     }
-}
-
-/// Type hold url or ip (used for database host)
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct IpOrUrl(#[serde(with = "crate::serde_with::ip_or_url")] String);
-
-impl Default for IpOrUrl {
-    fn default() -> Self {
-        IpOrUrl("localhost".to_owned())
-    }
-}
-
-impl IpOrUrl {
-    /// Returns &str ip or url
-    pub fn as_str(&self) -> &str {
-        &self.0
-    }
-}
-
-impl FromStr for IpOrUrl {
-    type Err = String;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(IpOrUrl(
-            if let Ok(res) = IpAddr::from_str(s).map(|i| i.to_string()) {
-                res
-            } else {
-                validate_domain(s)?
-            },
-        ))
-    }
-}
-
-fn validate_domain(domain: &str) -> Result<String, String> {
-    if domain != "localhost" {
-        let subs = domain.split('.');
-        for sub in subs {
-            let length = sub.chars().count();
-            if !sub.chars().all(|c| c.is_alphanumeric() || c == '-')
-                || sub.starts_with('-')
-                || sub.ends_with('-')
-                || (length > 0 && length <= 64)
-            {
-                return Err("Invalid domain name".to_owned());
-            }
-        }
-    }
-    Ok(domain.to_owned())
 }

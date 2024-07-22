@@ -95,7 +95,8 @@ pub struct Postgres {
     pub password: String,
     /// Database host
     #[derivative(Default(value = "defaults::postgres::host()"))]
-    pub host:     IpOrUrl,
+    #[serde(with = "serde_with::host")]
+    pub host:     Host,
     /// Database port
     #[derivative(Default(value = "defaults::postgres::port()"))]
     pub port:     u16,

@@ -21,33 +21,9 @@
 
 //! Serialize and deserialize some oxidetalis configurations
 
-use serde::{de::Error as DeError, Deserialize, Deserializer};
+use std::str::FromStr;
 
-/// Serialize and deserialze the string of IpOrUrl struct
-pub(crate) mod ip_or_url {
-    use std::str::FromStr;
-
-    use serde::{de::Error as DeError, Deserialize, Deserializer, Serializer};
-
-    use crate::IpOrUrl;
-
-    pub fn serialize<S>(value: &str, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        serializer.serialize_str(value)
-    }
-
-    pub fn deserialize<'de, D>(de: D) -> Result<String, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        Ok(IpOrUrl::from_str(&String::deserialize(de)?)
-            .map_err(DeError::custom)?
-            .as_str()
-            .to_owned())
-    }
-}
+use serde::{de::Error as DeError, Deserialize, Deserializer, Serializer};
 
 pub fn deserialize_url_path<'de, D>(de: D) -> Result<String, D::Error>
 where
@@ -60,4 +36,25 @@ where
         ));
     }
     Ok(url_path)
+}
+
+pub mod host {
+    #[allow(clippy::wildcard_imports)]
+    use super::*;
+    use crate::Host;
+
+    pub fn deserialize<'de, D>(de: D) -> Result<Host, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        Host::from_str(&String::deserialize(de)?)
+            .map_err(|_| DeError::custom("Invalid host name, invalid IPv4, IPv6 or domain name"))
+    }
+
+    pub fn serialize<S>(host: &Host, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_str(&host.to_string())
+    }
 }

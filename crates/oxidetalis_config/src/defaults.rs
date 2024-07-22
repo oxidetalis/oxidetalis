@@ -81,7 +81,6 @@ pub(crate) mod openapi {
 
 /// Postgres default configs
 pub(crate) mod postgres {
-    use std::str::FromStr;
 
     pub fn user() -> String {
         "oxidetalis".to_owned()
@@ -89,8 +88,9 @@ pub(crate) mod postgres {
     pub fn password() -> String {
         "oxidetalis".to_owned()
     }
-    pub fn host() -> crate::IpOrUrl {
-        crate::IpOrUrl::from_str("localhost").expect("Is a valid localhost")
+    pub const fn host() -> crate::Host {
+        #[allow(clippy::absolute_paths)]
+        crate::Host(url::Host::Ipv4(std::net::Ipv4Addr::new(127, 0, 0, 1)))
     }
     pub fn name() -> String {
         "oxidetalis_db".to_owned()

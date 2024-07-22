@@ -36,11 +36,7 @@ use crate::nonce::NonceCache;
 pub(crate) fn postgres_url(db_config: &Postgres) -> String {
     format!(
         "postgres://{}:{}@{}:{}/{}",
-        db_config.user,
-        db_config.password,
-        db_config.host.as_str(),
-        db_config.port,
-        db_config.name
+        db_config.user, db_config.password, db_config.host, db_config.port, db_config.name
     )
 }
 

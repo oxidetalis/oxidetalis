@@ -26,7 +26,7 @@ use std::{net::IpAddr, path::PathBuf};
 use clap::Parser;
 use oxidetalis_core::types::Size;
 
-use crate::{types::OpenApiViewer, IpOrUrl};
+use crate::types::{Host, OpenApiViewer};
 
 /// Header message, used in the help message
 const HEADER: &str = r#"Copyright (C) 2024 Awiteb <a@4rs.nl>, OxideTalis Contributors
@@ -74,7 +74,7 @@ pub struct CliArgs {
     pub register_enable:         Option<bool>,
     /// Hostname or IP address of the PostgreSQL database.
     #[clap(long, env = "OXIDETALIS_DB_HOST")]
-    pub postgres_host:           Option<IpOrUrl>,
+    pub postgres_host:           Option<Host>,
     /// Port number of the PostgreSQL database.
     #[clap(long, env = "OXIDETALIS_DB_PORT")]
     pub postgres_port:           Option<u16>,
