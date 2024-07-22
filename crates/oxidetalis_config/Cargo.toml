@@ -19,6 +19,7 @@ salvo_core      = { workspace = true }
 salvo-oapi      = { workspace = true }
 base58          = { workspace = true }
 clap            = { version = "4.5.7", features = ["derive", "env"] }
+url             = { version = "2.5.2", default-features = false, features = ["serde"] }
 toml            = "0.8.14"
 derivative      = "2.2.0"
 
