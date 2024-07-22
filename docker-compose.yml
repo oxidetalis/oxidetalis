@@ -1,4 +1,3 @@
-version: '3'
 services:
   oxidetalis:
     container_name: oxidetalis
@@ -6,7 +5,17 @@ services:
       context: ./
       dockerfile: ./crates/oxidetalis/Dockerfile
     environment:
+      # Logging level
+      - RUST_LOG=info
       - OXIDETALIS_CONFIG=/app/config.toml
+      # In docker host
+      - OXIDETALIS_SERVER_HOST=0.0.0.0
+      # Connect to the below db
+      - OXIDETALIS_DB_HOST=db
+      - OXIDETALIS_DB_PORT=5432
+      - OXIDETALIS_DB_USER=oxidetalis
+      - OXIDETALIS_DB_PASSWORD=oxidetalis
+      - OXIDETALIS_DB_NAME=oxidetalis_db
     ports:
       - 127.0.0.1:7294:7294
     depends_on:
@@ -20,6 +29,12 @@ services:
       POSTGRES_USER: oxidetalis
       POSTGRES_PASSWORD: oxidetalis
       POSTGRES_DB: oxidetalis_db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "db_prod"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s  
     # This for devlopment only
     ports:
       - 127.0.0.1:5432:5432
