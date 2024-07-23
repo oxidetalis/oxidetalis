@@ -45,7 +45,7 @@ impl UserTableExt for DatabaseConnection {
     #[logcall]
     async fn register_user(&self, public_key: &PublicKey, is_admin: bool) -> ServerResult<()> {
         if let Err(err) = (UserActiveModel {
-            public_key: Set(public_key.to_string()),
+            public_key: Set(*public_key),
             is_admin: Set(is_admin),
             ..Default::default()
         })
@@ -63,7 +63,7 @@ impl UserTableExt for DatabaseConnection {
     #[logcall]
     async fn get_user_by_pubk(&self, public_key: &PublicKey) -> ServerResult<Option<UserModel>> {
         UserEntity::find()
-            .filter(UserColumn::PublicKey.eq(public_key.to_string()))
+            .filter(UserColumn::PublicKey.eq(public_key))
             .one(self)
             .await
             .map_err(Into::into)

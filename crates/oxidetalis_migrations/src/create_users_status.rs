@@ -65,7 +65,7 @@ impl MigrationTrait for Migration {
                             .on_update(ForeignKeyAction::NoAction)
                             .on_delete(ForeignKeyAction::Cascade),
                     )
-                    .col(ColumnDef::new(UsersStatus::Target).string().not_null())
+                    .col(ColumnDef::new(UsersStatus::Target).binary().not_null())
                     .col(
                         ColumnDef::new(UsersStatus::Status)
                             .enumeration(

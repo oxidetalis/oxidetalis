@@ -21,6 +21,7 @@
 
 //! Entity for `users` table
 
+use oxidetalis_core::types::PublicKey;
 use sea_orm::entity::prelude::*;
 
 use crate::prelude::*;
@@ -30,7 +31,7 @@ use crate::prelude::*;
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id:         UserId,
-    pub public_key: String,
+    pub public_key: PublicKey,
     pub is_admin:   bool,
 }
 

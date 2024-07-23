@@ -42,7 +42,7 @@ impl InChatRequestsExt for DatabaseConnection {
     ) -> ServerResult<()> {
         InChatRequestsEntity::insert(InChatRequestsActiveModel {
             recipient_id: Set(recipient.id),
-            sender: Set(sender.to_string()),
+            sender: Set(*sender),
             in_on: Set(Utc::now()),
             ..Default::default()
         })

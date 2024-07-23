@@ -54,7 +54,7 @@ impl Default for WhiteListedUser {
 impl From<UsersStatusModel> for WhiteListedUser {
     fn from(user: UsersStatusModel) -> Self {
         Self {
-            public_key:     PublicKey::from_str(&user.target).expect("Is valid public key"),
+            public_key:     user.target,
             whitelisted_at: user.updated_at,
         }
     }
@@ -72,7 +72,7 @@ impl Default for BlackListedUser {
 impl From<UsersStatusModel> for BlackListedUser {
     fn from(user: UsersStatusModel) -> Self {
         Self {
-            public_key:     PublicKey::from_str(&user.target).expect("Is valid public key"),
+            public_key:     user.target,
             blacklisted_at: user.updated_at,
         }
     }

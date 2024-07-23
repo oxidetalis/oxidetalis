@@ -11,8 +11,9 @@ rust-version.workspace = true
 
 
 [dependencies]
-sea-orm = { workspace = true }
-chrono  = { workspace = true }
+oxidetalis_core = { workspace = true, features = ["sea-orm"] }
+sea-orm         = { workspace = true }
+chrono          = { workspace = true }
 
 [lints.rust]
 unsafe_code = "deny"

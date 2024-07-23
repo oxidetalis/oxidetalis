@@ -43,7 +43,7 @@ impl MigrationTrait for Migration {
                     )
                     .col(
                         ColumnDef::new(Users::PublicKey)
-                            .string()
+                            .binary()
                             .not_null()
                             .unique_key(),
                     )

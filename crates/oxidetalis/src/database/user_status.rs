@@ -138,7 +138,7 @@ impl UsersStatusExt for DatabaseConnection {
         whitelister: &UserModel,
         target_public_key: &PublicKey,
     ) -> ServerResult<()> {
-        if whitelister.public_key == target_public_key.to_string() {
+        if &whitelister.public_key == target_public_key {
             return Err(WsError::CannotAddSelfToWhitelist.into());
         }
 
@@ -156,7 +156,7 @@ impl UsersStatusExt for DatabaseConnection {
             user.update(self).await?;
         } else if let Err(err) = (UsersStatusActiveModel {
             user_id: Set(whitelister.id),
-            target: Set(target_public_key.to_string()),
+            target: Set(*target_public_key),
             status: Set(AccessStatus::Whitelisted),
             updated_at: Set(Utc::now()),
             ..Default::default()
@@ -181,7 +181,7 @@ impl UsersStatusExt for DatabaseConnection {
         blacklister: &UserModel,
         target_public_key: &PublicKey,
     ) -> ServerResult<()> {
-        if blacklister.public_key == target_public_key.to_string() {
+        if &blacklister.public_key == target_public_key {
             return Err(WsError::CannotAddSelfToBlacklist.into());
         }
 
@@ -199,7 +199,7 @@ impl UsersStatusExt for DatabaseConnection {
             user.update(self).await?;
         } else if let Err(err) = (UsersStatusActiveModel {
             user_id: Set(blacklister.id),
-            target: Set(target_public_key.to_string()),
+            target: Set(*target_public_key),
             status: Set(AccessStatus::Blacklisted),
             updated_at: Set(Utc::now()),
             ..Default::default()
@@ -297,7 +297,7 @@ async fn get_user_status(
     user.find_related(UsersStatusEntity)
         .filter(
             UsersStatusColumn::Target
-                .eq(target_public_key.to_string())
+                .eq(target_public_key)
                 .and(UsersStatusColumn::Status.eq(status)),
         )
         .one(conn)

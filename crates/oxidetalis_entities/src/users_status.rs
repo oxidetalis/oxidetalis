@@ -22,6 +22,7 @@
 //! Entity for `users_status` table
 
 use chrono::Utc;
+use oxidetalis_core::types::PublicKey;
 use sea_orm::entity::prelude::*;
 
 use crate::prelude::*;
@@ -41,8 +42,7 @@ pub struct Model {
     #[sea_orm(primary_key)]
     pub id:         UserId,
     pub user_id:    UserId,
-    /// Public key of the target
-    pub target:     String,
+    pub target:     PublicKey,
     pub status:     AccessStatus,
     pub updated_at: chrono::DateTime<Utc>,
 }

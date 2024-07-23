@@ -57,7 +57,7 @@ impl OutChatRequestsExt for DatabaseConnection {
     ) -> ServerResult<Option<OutChatRequestsModel>> {
         requester
             .find_related(OutChatRequestsEntity)
-            .filter(OutChatRequestsColumn::Recipient.eq(recipient.to_string()))
+            .filter(OutChatRequestsColumn::Recipient.eq(recipient))
             .one(self)
             .await
             .map_err(Into::into)
@@ -71,7 +71,7 @@ impl OutChatRequestsExt for DatabaseConnection {
     ) -> ServerResult<()> {
         if let Err(err) = (OutChatRequestsActiveModel {
             sender_id: Set(requester.id),
-            recipient: Set(recipient.to_string()),
+            recipient: Set(*recipient),
             out_on: Set(Utc::now()),
             ..Default::default()
         }

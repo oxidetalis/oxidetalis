@@ -57,7 +57,7 @@ impl MigrationTrait for Migration {
                             .on_update(ForeignKeyAction::NoAction)
                             .on_delete(ForeignKeyAction::Cascade),
                     )
-                    .col(ColumnDef::new(InChatRequests::Sender).string().not_null())
+                    .col(ColumnDef::new(InChatRequests::Sender).binary().not_null())
                     .col(
                         ColumnDef::new(InChatRequests::InOn)
                             .timestamp_with_time_zone()

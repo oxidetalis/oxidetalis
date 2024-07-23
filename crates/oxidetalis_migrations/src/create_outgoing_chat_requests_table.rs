@@ -59,7 +59,7 @@ impl MigrationTrait for Migration {
                     )
                     .col(
                         ColumnDef::new(OutChatRequests::Recipient)
-                            .string()
+                            .binary()
                             .not_null(),
                     )
                     .col(

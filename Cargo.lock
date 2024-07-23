@@ -1954,6 +1954,7 @@ dependencies = [
  "k256",
  "rand",
  "salvo-oapi",
+ "sea-orm",
  "serde",
  "sha2",
  "thiserror",
@@ -1964,6 +1965,7 @@ name = "oxidetalis_entities"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "oxidetalis_core",
  "sea-orm",
 ]
 

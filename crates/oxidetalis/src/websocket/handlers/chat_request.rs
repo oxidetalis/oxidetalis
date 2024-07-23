@@ -16,8 +16,6 @@
 
 //! Handler for incoming and outgoing chat requests.
 
-use std::str::FromStr;
-
 use oxidetalis_core::types::PublicKey;
 use oxidetalis_entities::prelude::*;
 use sea_orm::DatabaseConnection;
@@ -47,14 +45,12 @@ pub async fn handle_chat_request(
     if from_user.id == to_user.id {
         return Some(WsError::CannotSendChatRequestToSelf.into());
     }
-    // FIXME: When change the entity public key to a PublicKey type, change this
-    let from_public_key = PublicKey::from_str(&from_user.public_key).expect("Is valid public key");
 
     if try_ws!(Some db.get_chat_request_to(from_user, to_public_key).await).is_some() {
         return Some(WsError::AlreadySendChatRequest.into());
     }
 
-    if try_ws!(Some db.is_blacklisted(&to_user, &from_public_key).await) {
+    if try_ws!(Some db.is_blacklisted(&to_user, &from_user.public_key).await) {
         return Some(WsError::RecipientBlacklist.into());
     }
 
@@ -64,17 +60,17 @@ pub async fn handle_chat_request(
         return Some(WsError::InternalServerError.into());
     }
 
-    if try_ws!(Some db.is_whitelisted(&to_user, &from_public_key).await) {
+    if try_ws!(Some db.is_whitelisted(&to_user, &from_user.public_key).await) {
         return Some(WsError::AlreadyInRecipientWhitelist.into());
     }
 
     try_ws!(Some db.save_out_chat_request(from_user, to_public_key).await);
     if let Some(conn_id) = ONLINE_USERS.is_online(to_public_key).await {
         ONLINE_USERS
-            .send(&conn_id, ServerEvent::chat_request(&from_public_key))
+            .send(&conn_id, ServerEvent::chat_request(&from_user.public_key))
             .await;
     } else {
-        try_ws!(Some db.save_in_chat_request(&from_public_key, &to_user).await);
+        try_ws!(Some db.save_in_chat_request(&from_user.public_key, &to_user).await);
     }
     None
 }
@@ -96,12 +92,8 @@ pub async fn handle_chat_response(
         return Some(WsError::CannotRespondToOwnChatRequest.into());
     }
 
-    // FIXME: When change the entity public key to a PublicKey type, change this
-    let recipient_public_key =
-        PublicKey::from_str(&recipient_user.public_key).expect("Is valid public key");
-
     if try_ws!(Some
-        db.get_chat_request_to(&sender_user, &recipient_public_key)
+        db.get_chat_request_to(&sender_user, &recipient_user.public_key)
             .await
     )
     .is_none()
@@ -118,7 +110,7 @@ pub async fn handle_chat_response(
     };
 
     try_ws!(Some
-        db.remove_out_chat_request(&sender_user, &recipient_public_key)
+        db.remove_out_chat_request(&sender_user, &recipient_user.public_key)
             .await
     );
 
@@ -126,7 +118,7 @@ pub async fn handle_chat_response(
         ONLINE_USERS
             .send(
                 &conn_id,
-                ServerEvent::chat_request_response(recipient_public_key, accepted),
+                ServerEvent::chat_request_response(recipient_user.public_key, accepted),
             )
             .await;
     } else {

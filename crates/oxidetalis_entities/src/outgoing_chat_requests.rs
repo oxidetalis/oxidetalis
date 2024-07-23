@@ -22,6 +22,7 @@
 //! Entity for `out_chat_requests` table
 
 use chrono::Utc;
+use oxidetalis_core::types::PublicKey;
 use sea_orm::entity::prelude::*;
 
 use crate::prelude::*;
@@ -33,7 +34,7 @@ pub struct Model {
     pub id:        UserId,
     pub sender_id: UserId,
     /// Public key of the recipient
-    pub recipient: String,
+    pub recipient: PublicKey,
     /// The timestamp of the request, when it was sent
     pub out_on:    chrono::DateTime<Utc>,
 }
