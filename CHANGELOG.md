@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -  Change the default port ([`9ff5548`](https://git.4rs.nl/oxidetalis/oxidetalis/commit/9ff5548601c4f6b8aee9522601f4723c2a50fdae))
 -  Remove the nonce cache limit ([`d442e73`](https://git.4rs.nl/oxidetalis/oxidetalis/commit/d442e73ed7253f2fa8c381029058d51627de25b3))
 -  Use Scalar as default openapi UI ([`221a47c`](https://git.4rs.nl/oxidetalis/oxidetalis/commit/221a47cfd03d12a759dc9acafb56380be4bf2502))
+-  Change config private key type to `K256Secret` ([`a01f4ad`](https://git.4rs.nl/oxidetalis/oxidetalis/commit/a01f4add0c377016311db7f5efc94d55ac9a5dc0))
+-  Update public key column type from `String` to `PublicKey` ([`1d1bb96`](https://git.4rs.nl/oxidetalis/oxidetalis/commit/1d1bb962bb95e4fc6d9c821accb1df116a1bc759))
 ### Fixed
 -  Change the CLI settings ([`abbc083`](https://git.4rs.nl/oxidetalis/oxidetalis/commit/abbc083371c4a9c1b2a9b45bee16f459d16082f0))
 -  Change the way checking if the file changed ([`18fd708`](https://git.4rs.nl/oxidetalis/oxidetalis/commit/18fd708c2615f9288c171ee1478f4b4c52a84ea0))
