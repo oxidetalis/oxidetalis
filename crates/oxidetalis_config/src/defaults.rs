@@ -25,10 +25,7 @@
 pub(crate) mod server {
     use std::net::{IpAddr, Ipv4Addr};
 
-    use oxidetalis_core::{
-        cipher::K256Secret,
-        types::{PrivateKey, Size},
-    };
+    use oxidetalis_core::{cipher::K256Secret, types::Size};
 
     pub fn name() -> String {
         "example.com".to_owned()
@@ -39,8 +36,8 @@ pub(crate) mod server {
     pub const fn port() -> u16 {
         7294
     }
-    pub fn private_key() -> PrivateKey {
-        K256Secret::new().privkey()
+    pub fn private_key() -> K256Secret {
+        K256Secret::new()
     }
     pub const fn nonce_cache_size() -> Size {
         Size::MB(1)

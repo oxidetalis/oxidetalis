@@ -23,7 +23,7 @@
 use std::{fs, io::Error as IoError, net::IpAddr, path::Path};
 
 use derivative::Derivative;
-use oxidetalis_core::types::{PrivateKey, Size};
+use oxidetalis_core::{cipher::K256Secret, types::Size};
 use serde::{Deserialize, Serialize};
 use toml::{de::Error as TomlDeError, ser::Error as TomlSerError};
 
@@ -66,7 +66,7 @@ pub struct Server {
     pub port:             u16,
     /// Server keypair
     #[derivative(Default(value = "defaults::server::private_key()"))]
-    pub private_key:      PrivateKey,
+    pub private_key:      K256Secret,
     /// Nonce cache limit
     #[derivative(Default(value = "defaults::server::nonce_cache_size()"))]
     pub nonce_cache_size: Size,

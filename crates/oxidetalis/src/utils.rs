@@ -22,8 +22,7 @@ use chrono::Utc;
 use logcall::logcall;
 use oxidetalis_config::Postgres;
 use oxidetalis_core::{
-    cipher::K256Secret,
-    types::{PrivateKey, PublicKey, Signature},
+    types::{PublicKey, Signature},
     PUBLIC_KEY_HEADER,
     SIGNATURE_HEADER,
 };
@@ -48,16 +47,6 @@ pub(crate) async fn is_valid_nonce(signature: &Signature, nonce_cache: &NonceCac
         .is_some_and(|n| n <= 20);
     let unused_nonce = new_timestamp && nonce_cache.add_nonce(signature.nonce()).await;
     new_timestamp && unused_nonce
-}
-
-/// Returns true if the given signature is valid.
-pub(crate) fn is_valid_signature(
-    signer: &PublicKey,
-    private_key: &PrivateKey,
-    signature: &Signature,
-    data: &[u8],
-) -> bool {
-    K256Secret::from_privkey(private_key).verify(data, signature, signer)
 }
 
 /// Extract the sender public key from the request

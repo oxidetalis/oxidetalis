@@ -25,6 +25,7 @@ use base58::FromBase58;
 use serde::{de::Error as DeError, Deserialize, Serialize};
 
 use super::{PrivateKey, PublicKey, Signature};
+use crate::cipher::K256Secret;
 
 impl<'de> Deserialize<'de> for PrivateKey {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
@@ -97,5 +98,23 @@ impl Serialize for Signature {
         S: serde::Serializer,
     {
         serializer.serialize_str(self.to_string().as_str())
+    }
+}
+
+impl Serialize for K256Secret {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        PrivateKey::serialize(&self.privkey(), serializer)
+    }
+}
+
+impl<'de> Deserialize<'de> for K256Secret {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        Ok(Self::from_privkey(&PrivateKey::deserialize(deserializer)?))
     }
 }

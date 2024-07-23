@@ -23,7 +23,7 @@ use chrono::Utc;
 use errors::{WsError, WsResult};
 use futures::{channel::mpsc, FutureExt, StreamExt, TryStreamExt};
 use once_cell::sync::Lazy;
-use oxidetalis_core::{cipher::K256Secret, types::PublicKey};
+use oxidetalis_core::types::PublicKey;
 use oxidetalis_entities::prelude::*;
 use salvo::{
     handler,
@@ -102,9 +102,7 @@ pub async fn user_connected(
     let db_conn = depot.db_conn();
     let public_key =
         utils::extract_public_key(req).expect("The public key was checked in the middleware");
-    // FIXME: The config should hold `K256Secret` not `PrivateKey`
-    let shared_secret =
-        K256Secret::from_privkey(&depot.config().server.private_key).shared_secret(&public_key);
+    let shared_secret = depot.config().server.private_key.shared_secret(&public_key);
 
     WebSocketUpgrade::new()
         .upgrade(req, res, move |ws| {

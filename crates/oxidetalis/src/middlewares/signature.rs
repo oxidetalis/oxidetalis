@@ -71,11 +71,10 @@ pub async fn signature_check(
     };
 
     if !utils::is_valid_nonce(&signature, &depot.nonce_cache()).await
-        || !utils::is_valid_signature(
-            &sender_public_key,
-            &depot.config().server.private_key,
-            &signature,
+        || !depot.config().server.private_key.verify(
             data.as_bytes(),
+            &signature,
+            &sender_public_key,
         )
     {
         write_err("Invalid signature", UNAUTHORIZED);

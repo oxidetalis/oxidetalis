@@ -72,6 +72,7 @@ type HmacSha256 = hmac::Hmac<sha2::Sha256>;
 
 /// An wrapper around the k256 crate to provide a simple API for ecdh key
 /// exchange and keypair generation.
+#[derive(Clone)]
 pub struct K256Secret {
     /// The private key scalar
     scalar:     NonZeroScalar,
