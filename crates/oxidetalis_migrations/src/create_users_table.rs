@@ -48,6 +48,11 @@ impl MigrationTrait for Migration {
                             .unique_key(),
                     )
                     .col(
+                        ColumnDef::new(Users::LastLogout)
+                            .timestamp_with_time_zone()
+                            .not_null(),
+                    )
+                    .col(
                         ColumnDef::new(Users::IsAdmin)
                             .boolean()
                             .not_null()
@@ -64,5 +69,6 @@ pub enum Users {
     Table,
     Id,
     PublicKey,
+    LastLogout,
     IsAdmin,
 }

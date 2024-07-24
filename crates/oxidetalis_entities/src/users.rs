@@ -21,6 +21,7 @@
 
 //! Entity for `users` table
 
+use chrono::Utc;
 use oxidetalis_core::types::PublicKey;
 use sea_orm::entity::prelude::*;
 
@@ -30,9 +31,10 @@ use crate::prelude::*;
 #[sea_orm(table_name = "users")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    pub id:         UserId,
-    pub public_key: PublicKey,
-    pub is_admin:   bool,
+    pub id:          UserId,
+    pub public_key:  PublicKey,
+    pub last_logout: chrono::DateTime<Utc>,
+    pub is_admin:    bool,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

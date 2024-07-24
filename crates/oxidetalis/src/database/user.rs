@@ -16,6 +16,7 @@
 
 //! Functions for interacting with the user table in the database.
 
+use chrono::Utc;
 use logcall::logcall;
 use oxidetalis_core::types::PublicKey;
 use oxidetalis_entities::prelude::*;
@@ -47,6 +48,7 @@ impl UserTableExt for DatabaseConnection {
         if let Err(err) = (UserActiveModel {
             public_key: Set(*public_key),
             is_admin: Set(is_admin),
+            last_logout: Set(Utc::now()),
             ..Default::default()
         })
         .save(self)

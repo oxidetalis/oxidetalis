@@ -177,7 +177,7 @@ async fn handle_socket(
                 }
             };
         }
-        user_disconnected(&conn_id, &user_public_key).await;
+        user_disconnected(&db_conn, &conn_id, &user_public_key, user).await;
     };
     tokio_spawn(fut);
 }
@@ -225,8 +225,21 @@ async fn handle_events(
 }
 
 /// Handle user disconnected
-async fn user_disconnected(conn_id: &Uuid, public_key: &PublicKey) {
+async fn user_disconnected(
+    db_conn: &DatabaseConnection,
+    conn_id: &Uuid,
+    public_key: &PublicKey,
+    user: Option<UserModel>,
+) {
     ONLINE_USERS.remove_user(conn_id).await;
+    if ONLINE_USERS.is_online(public_key).await.is_none() {
+        if let Some(mut user) = user.map(IntoActiveModel::into_active_model) {
+            user.last_logout = Set(Utc::now());
+            if let Err(err) = user.update(db_conn).await {
+                log::error!("{err}");
+            }
+        }
+    }
     log::debug!("User disconnect: ConnId(={conn_id}) PublicKey(={public_key})");
 }
 
