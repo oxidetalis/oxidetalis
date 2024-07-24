@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## unreleased
 ### Added
+-  Add `last_logout` column to `users` table ([`b79587f`](https://git.4rs.nl/oxidetalis/oxidetalis/commit/b79587f5371543d6e84a33d6c8afe786ffe8bc28))
 -  Add `sign_with_shared_secret` function to `K256Secret` ([`39337f8`](https://git.4rs.nl/oxidetalis/oxidetalis/commit/39337f8d90bd1ebbd327d766b6ba9b175a651255))
 -  CI to create `CONTRIBUTORS.md` file ([`ce566ad`](https://git.4rs.nl/oxidetalis/oxidetalis/commit/ce566ada273cfab0e34ae813a19c0bacbf3654bc))
 -  Chat request implementation ([`8888bf2`](https://git.4rs.nl/oxidetalis/oxidetalis/commit/8888bf2d60428e5af77c8892ec4d48bd533403ea))
