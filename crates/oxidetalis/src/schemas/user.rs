@@ -18,7 +18,7 @@
 
 use std::str::FromStr;
 
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, NaiveDate, NaiveDateTime, NaiveTime, Utc};
 use oxidetalis_core::types::PublicKey;
 use oxidetalis_entities::prelude::*;
 use salvo::oapi::ToSchema;
@@ -46,7 +46,11 @@ impl Default for WhiteListedUser {
     fn default() -> Self {
         WhiteListedUser::new(
             PublicKey::from_str("bYhbrm61ov8GLZfskUYbsCLJTfaacMsuTBYgBABEH9dy").expect("is valid"),
-            Utc::now(),
+            chrono::NaiveDateTime::new(
+                NaiveDate::from_ymd_opt(2015, 5, 16).expect("Is valid date"),
+                NaiveTime::from_hms_opt(12, 17, 20).expect("Is valid time"),
+            )
+            .and_utc(),
         )
     }
 }
@@ -64,7 +68,11 @@ impl Default for BlackListedUser {
     fn default() -> Self {
         BlackListedUser::new(
             PublicKey::from_str("bYhbrm61ov8GLZfskUYbsCLJTfaacMsuTBYgBABEH9dy").expect("is valid"),
-            Utc::now(),
+            NaiveDateTime::new(
+                NaiveDate::from_ymd_opt(2015, 5, 16).expect("Is valid date"),
+                NaiveTime::from_hms_opt(12, 17, 20).expect("Is valid time"),
+            )
+            .and_utc(),
         )
     }
 }
