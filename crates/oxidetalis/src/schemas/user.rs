@@ -24,6 +24,7 @@ use oxidetalis_entities::prelude::*;
 use salvo::oapi::ToSchema;
 use serde::{Deserialize, Serialize};
 
+/// WhiteListed user schema, represents a whitelisted user.
 #[derive(Serialize, Deserialize, Clone, Debug, ToSchema, derive_new::new)]
 #[salvo(schema(name = WhiteListedUser, example = json!(WhiteListedUser::default())))]
 pub struct WhiteListedUser {
@@ -33,6 +34,7 @@ pub struct WhiteListedUser {
     pub whitelisted_at: DateTime<Utc>,
 }
 
+/// Blacklisted user schema, represents a blacklisted user.
 #[derive(Serialize, Deserialize, Clone, Debug, ToSchema, derive_new::new)]
 #[salvo(schema(name = BlackListedUser, example = json!(BlackListedUser::default())))]
 pub struct BlackListedUser {

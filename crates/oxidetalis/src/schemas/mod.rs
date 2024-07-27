@@ -33,15 +33,7 @@ mod user;
 
 pub use user::*;
 
-/// Json message schema, used for returning messages to the client, the message
-/// must be human readable.
-///
-/// # Example
-/// ```json
-/// {
-///    "message": "Message"
-/// }
-/// ```
+/// Message schema, used for returning messages.
 #[derive(Serialize, Deserialize, Clone, Debug, ToSchema, derive_new::new)]
 #[salvo(schema(name = MessageSchema, example = json!(MessageSchema::new("Message".to_owned()))))]
 pub struct MessageSchema {
