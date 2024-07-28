@@ -16,6 +16,7 @@
 
 //! Request signature middleware.
 
+use oxidetalis_core::types::{PublicKey, Signature};
 use salvo::{
     handler,
     http::{Body, StatusCode},
@@ -23,6 +24,7 @@ use salvo::{
     FlowCtrl,
     Request,
     Response,
+    Writer,
 };
 
 use crate::{extensions::DepotExt, utils};
@@ -37,6 +39,8 @@ pub async fn signature_check(
     res: &mut Response,
     depot: &mut Depot,
     ctrl: &mut FlowCtrl,
+    sender_public_key: PublicKey,
+    signature: Signature,
 ) {
     const UNAUTHORIZED: StatusCode = StatusCode::UNAUTHORIZED;
     let mut write_err =
@@ -51,22 +55,6 @@ pub async fn signature_check(
                 write_err(&err.to_string(), UNAUTHORIZED);
                 return;
             }
-        }
-    };
-
-    let signature = match utils::extract_signature(req) {
-        Ok(s) => s,
-        Err(err) => {
-            write_err(&err.to_string(), UNAUTHORIZED);
-            return;
-        }
-    };
-
-    let sender_public_key = match utils::extract_public_key(req) {
-        Ok(k) => k,
-        Err(err) => {
-            write_err(&err.to_string(), UNAUTHORIZED);
-            return;
         }
     };
 

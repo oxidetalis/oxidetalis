@@ -22,6 +22,8 @@
 //! Oxidetalis server types
 
 mod cipher;
+#[cfg(feature = "openapi")]
+mod impl_openapi;
 #[cfg(feature = "sea-orm")]
 mod impl_sea_orm;
 #[cfg(feature = "serde")]

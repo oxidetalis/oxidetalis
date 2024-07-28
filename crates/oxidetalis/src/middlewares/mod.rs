@@ -24,10 +24,8 @@ use salvo::{
     Response,
 };
 
-mod public_key;
 mod signature;
 
-pub use public_key::*;
 pub use signature::*;
 
 use crate::{routes::write_json_body, schemas::MessageSchema};

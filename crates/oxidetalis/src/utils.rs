@@ -16,17 +16,10 @@
 
 //! Oxidetalis server utilities, utilities shared across the crate.
 
-use std::str::FromStr;
-
 use chrono::Utc;
 use logcall::logcall;
 use oxidetalis_config::Postgres;
-use oxidetalis_core::{
-    types::{PublicKey, Signature},
-    PUBLIC_KEY_HEADER,
-    SIGNATURE_HEADER,
-};
-use salvo::Request;
+use oxidetalis_core::types::Signature;
 
 use crate::nonce::NonceCache;
 
@@ -47,32 +40,4 @@ pub(crate) async fn is_valid_nonce(signature: &Signature, nonce_cache: &NonceCac
         .is_some_and(|n| n <= 20);
     let unused_nonce = new_timestamp && nonce_cache.add_nonce(signature.nonce()).await;
     new_timestamp && unused_nonce
-}
-
-/// Extract the sender public key from the request
-///
-/// Returns the public key of the sender extracted from the request, or the
-/// reason why it failed.
-pub(crate) fn extract_public_key(req: &Request) -> Result<PublicKey, String> {
-    req.headers()
-        .get(PUBLIC_KEY_HEADER)
-        .map(|v| {
-            PublicKey::from_str(v.to_str().map_err(|err| err.to_string())?)
-                .map_err(|err| err.to_string())
-        })
-        .ok_or_else(|| "The public key is missing".to_owned())?
-}
-
-/// Extract the signature from the request
-///
-/// Returns the signature extracted from the request, or the reason why it
-/// failed.
-pub(crate) fn extract_signature(req: &Request) -> Result<Signature, String> {
-    req.headers()
-        .get(SIGNATURE_HEADER)
-        .map(|v| {
-            Signature::from_str(v.to_str().map_err(|err| err.to_string())?)
-                .map_err(|err| err.to_string())
-        })
-        .ok_or_else(|| "The signature is missing".to_owned())?
 }

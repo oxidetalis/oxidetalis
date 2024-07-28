@@ -16,6 +16,8 @@ thiserror  = { workspace = true }
 salvo-oapi = { workspace = true, optional = true }
 serde      = { workspace = true, optional = true }
 sea-orm    = { workspace = true, optional = true }
+salvo_core = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
 cbc        = { version = "0.1.2", features = ["alloc", "std"] }
 k256       = { version = "0.13.3", default-features = false, features = ["ecdh"] }
 rand       = { version = "0.8.5", default-features = false, features = ["std_rng", "std"] }
@@ -25,7 +27,7 @@ hmac       = "0.12.1"
 sha2       = "0.10.8"
 
 [features]
-openapi = ["dep:salvo-oapi"]
+openapi = ["dep:salvo-oapi", "dep:salvo_core", "dep:serde_json"]
 serde   = ["dep:serde"]
 sea-orm   = ["dep:sea-orm"]
 

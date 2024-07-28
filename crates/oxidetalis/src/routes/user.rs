@@ -17,7 +17,7 @@
 //! REST API endpoints for user management
 
 use oxidetalis_core::types::{PublicKey, Signature};
-use salvo::{http::StatusCode, oapi::endpoint, writing::Json, Depot, Request, Router, Writer};
+use salvo::{http::StatusCode, oapi::endpoint, writing::Json, Depot, Router, Writer};
 
 use super::{ApiError, ApiResult};
 use crate::{
@@ -26,7 +26,6 @@ use crate::{
     middlewares,
     parameters::Pagination,
     schemas::{BlackListedUser, EmptySchema, MessageSchema, WhiteListedUser},
-    utils,
 };
 
 /// (🔓) Register a user
@@ -38,22 +37,18 @@ use crate::{
     tags("User"),
     responses(
         (status_code = 201, description = "User registered"),
-        (status_code = 400, description = "The entered public key is already registered", content_type = "application/json", body = MessageSchema),
-        (status_code = 401, description = "The entered signature or public key is invalid", content_type = "application/json", body = MessageSchema),
+        (status_code = 400, description = "Invalid public key", content_type = "application/json", body = MessageSchema),
+        (status_code = 401, description = "Invalid signature", content_type = "application/json", body = MessageSchema),
         (status_code = 403, description = "Server registration is closed", content_type = "application/json", body = MessageSchema),
+        (status_code = 409, description = "The entered public key is already registered", content_type = "application/json", body = MessageSchema),
         (status_code = 429, description = "Too many requests", content_type = "application/json", body = MessageSchema),
         (status_code = 500, description = "Internal server error", content_type = "application/json", body = MessageSchema),
     ),
-    parameters(
-        ("X-OTMP-SIGNATURE" = Signature, Header, description = "Signature of the request"),
-        ("X-OTMP-PUBLIC"    = PublicKey, Header, description = "Public key of the sender"),
-    ),
+    parameters(Signature),
 )]
-pub async fn register(req: &Request, depot: &mut Depot) -> ApiResult<EmptySchema> {
+pub async fn register(public_key: PublicKey, depot: &mut Depot) -> ApiResult<EmptySchema> {
     let db = depot.db_conn();
     let config = depot.config();
-    let public_key =
-        utils::extract_public_key(req).expect("Public key should be checked in the middleware");
 
     if !db.users_exists_in_database().await? {
         db.register_user(&public_key, true).await?;
@@ -72,28 +67,22 @@ pub async fn register(req: &Request, depot: &mut Depot) -> ApiResult<EmptySchema
     tags("User"),
     responses(
         (status_code = 200, description = "Returns whitelisted users", content_type = "application/json", body = Vec<WhiteListedUser>),
-        (status_code = 400, description = "Wrong query parameter", content_type = "application/json", body = MessageSchema),
-        (status_code = 401, description = "The entered signature or public key is invalid", content_type = "application/json", body = MessageSchema),
+        (status_code = 400, description = "Invalid parameters or public key", content_type = "application/json", body = MessageSchema),
+        (status_code = 401, description = "Invalid signature", content_type = "application/json", body = MessageSchema),
         (status_code = 403, description = "Not registered user, must register first", content_type = "application/json", body = MessageSchema),
         (status_code = 429, description = "Too many requests", content_type = "application/json", body = MessageSchema),
         (status_code = 500, description = "Internal server error", content_type = "application/json", body = MessageSchema),
     ),
-    parameters(
-        ("X-OTMP-PUBLIC"    = PublicKey, Header, description = "Public key of the sender"),
-        ("X-OTMP-SIGNATURE" = Signature, Header, description = "Signature of the request"),
-    ),
+    parameters(Signature),
 )]
 async fn user_whitelist(
-    req: &mut Request,
     depot: &mut Depot,
     pagination: Pagination,
+    public_key: PublicKey,
 ) -> ApiResult<Json<Vec<WhiteListedUser>>> {
     let conn = depot.db_conn();
     let user = conn
-        .get_user_by_pubk(
-            &utils::extract_public_key(req)
-                .expect("Public key should be checked in the middleware"),
-        )
+        .get_user_by_pubk(&public_key)
         .await?
         .ok_or(ApiError::NotRegisteredUser)?;
     Ok(Json(
@@ -111,28 +100,22 @@ async fn user_whitelist(
     tags("User"),
     responses(
         (status_code = 200, description = "Returns blacklisted users", content_type = "application/json", body = Vec<BlackListedUser>),
-        (status_code = 400, description = "Wrong query parameter", content_type = "application/json", body = MessageSchema),
-        (status_code = 401, description = "The entered signature or public key is invalid", content_type = "application/json", body = MessageSchema),
+        (status_code = 400, description = "Invalid parameters or public key", content_type = "application/json", body = MessageSchema),
+        (status_code = 401, description = "Invalid signature", content_type = "application/json", body = MessageSchema),
         (status_code = 403, description = "Not registered user, must register first", content_type = "application/json", body = MessageSchema),
         (status_code = 429, description = "Too many requests", content_type = "application/json", body = MessageSchema),
         (status_code = 500, description = "Internal server error", content_type = "application/json", body = MessageSchema),
     ),
-    parameters(
-        ("X-OTMP-PUBLIC"    = PublicKey, Header, description = "Public key of the sender"),
-        ("X-OTMP-SIGNATURE" = Signature, Header, description = "Signature of the request"),
-    ),
+    parameters(Signature),
 )]
 async fn user_blacklist(
-    req: &mut Request,
     depot: &mut Depot,
     pagination: Pagination,
+    public_key: PublicKey,
 ) -> ApiResult<Json<Vec<BlackListedUser>>> {
     let conn = depot.db_conn();
     let user = conn
-        .get_user_by_pubk(
-            &utils::extract_public_key(req)
-                .expect("Public key should be checked in the middleware"),
-        )
+        .get_user_by_pubk(&public_key)
         .await?
         .ok_or(ApiError::NotRegisteredUser)?;
     Ok(Json(
@@ -150,6 +133,5 @@ pub fn route() -> Router {
         .push(Router::with_path("register").post(register))
         .push(Router::with_path("whitelist").get(user_whitelist))
         .push(Router::with_path("blacklist").get(user_blacklist))
-        .hoop(middlewares::public_key_check)
         .hoop(middlewares::signature_check)
 }

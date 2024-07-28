@@ -24,15 +24,6 @@
 use std::{fmt, str::FromStr};
 
 use base58::{FromBase58, ToBase58};
-#[cfg(feature = "openapi")]
-use salvo_oapi::{
-    schema::{
-        Schema as OapiSchema,
-        SchemaFormat as OapiSchemaFormat,
-        SchemaType as OapiSchemaType,
-    },
-    ToSchema,
-};
 
 use crate::cipher::{hmac_sha256, CipherError};
 
@@ -204,25 +195,5 @@ impl From<[u8; 56]> for Signature {
             timestamp:   signature[32..=39].try_into().expect(CORRECT_LENGTH),
             nonce:       signature[40..=55].try_into().expect(CORRECT_LENGTH),
         }
-    }
-}
-
-#[cfg(feature = "openapi")]
-impl ToSchema for PublicKey {
-    fn to_schema(_components: &mut salvo_oapi::Components) -> salvo_oapi::RefOr<OapiSchema> {
-        salvo_oapi::Object::new()
-            .schema_type(OapiSchemaType::String)
-            .format(OapiSchemaFormat::Custom("base58".to_owned()))
-            .into()
-    }
-}
-
-#[cfg(feature = "openapi")]
-impl ToSchema for Signature {
-    fn to_schema(_components: &mut salvo_oapi::Components) -> salvo_oapi::RefOr<OapiSchema> {
-        salvo_oapi::Object::new()
-            .schema_type(OapiSchemaType::String)
-            .format(OapiSchemaFormat::Custom("hex".to_owned()))
-            .into()
     }
 }

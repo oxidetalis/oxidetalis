@@ -33,6 +33,7 @@ use salvo::{
     Request,
     Response,
     Router,
+    Writer,
 };
 use sea_orm::DatabaseConnection;
 use tokio::{sync::RwLock, task::spawn as tokio_spawn, time::sleep as tokio_sleep};
@@ -49,7 +50,6 @@ use crate::{
     extensions::{DepotExt, OnlineUsersExt},
     middlewares,
     nonce::NonceCache,
-    utils,
 };
 
 /// Online users type
@@ -96,12 +96,11 @@ impl SocketUserData {
 pub async fn user_connected(
     req: &mut Request,
     res: &mut Response,
+    public_key: PublicKey,
     depot: &Depot,
 ) -> Result<(), StatusError> {
     let nonce_cache = depot.nonce_cache();
     let db_conn = depot.db_conn();
-    let public_key =
-        utils::extract_public_key(req).expect("The public key was checked in the middleware");
     let shared_secret = depot.config().server.private_key.shared_secret(&public_key);
 
     WebSocketUpgrade::new()
@@ -259,5 +258,4 @@ pub fn route() -> Router {
     Router::new()
         .push(Router::with_path("chat").get(user_connected))
         .hoop(middlewares::signature_check)
-        .hoop(middlewares::public_key_check)
 }
