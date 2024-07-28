@@ -148,38 +148,33 @@ async fn handle_socket(
     // TODO: Send the incoming chat request to the user, while they are offline.
     // This after adding last_login col to the user table
 
-    let fut = async move {
-        while let Some(Ok(msg)) = user_ws_receiver.next().await {
-            match handle_ws_msg(msg, &nonce_cache, &user_shared_secret).await {
-                Ok(event) => {
-                    if let Some(server_event) =
-                        handle_events(event, &db_conn, &conn_id, user.as_ref()).await
-                    {
-                        if let Err(err) = sender.unbounded_send(Ok(server_event
-                            .sign(&user_shared_secret)
-                            .as_ref()
-                            .into()))
-                        {
-                            log::error!("Websocket Error: {err}");
-                            break;
-                        }
-                    };
-                }
-                Err(err) => {
-                    if let Err(err) = sender.unbounded_send(Ok(ServerEvent::from(err)
-                        .sign(&user_shared_secret)
-                        .as_ref()
-                        .into()))
+    while let Some(Ok(msg)) = user_ws_receiver.next().await {
+        match handle_ws_msg(msg, &nonce_cache, &user_shared_secret).await {
+            Ok(event) => {
+                if let Some(server_event) =
+                    handle_events(event, &db_conn, &conn_id, user.as_ref()).await
+                {
+                    if let Err(err) = sender
+                        .unbounded_send(Ok(server_event.sign(&user_shared_secret).as_ref().into()))
                     {
                         log::error!("Websocket Error: {err}");
                         break;
-                    };
-                }
-            };
-        }
-        user_disconnected(&db_conn, &conn_id, &user_public_key, user).await;
-    };
-    tokio_spawn(fut);
+                    }
+                };
+            }
+            Err(err) => {
+                if let Err(err) = sender.unbounded_send(Ok(ServerEvent::from(err)
+                    .sign(&user_shared_secret)
+                    .as_ref()
+                    .into()))
+                {
+                    log::error!("Websocket Error: {err}");
+                    break;
+                };
+            }
+        };
+    }
+    user_disconnected(&db_conn, &conn_id, &user_public_key, user).await;
 }
 
 /// Handle websocket msg
