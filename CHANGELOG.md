@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 -  Change the CLI settings ([`abbc083`](https://git.4rs.nl/oxidetalis/oxidetalis/commit/abbc083371c4a9c1b2a9b45bee16f459d16082f0))
 -  Change the way checking if the file changed ([`18fd708`](https://git.4rs.nl/oxidetalis/oxidetalis/commit/18fd708c2615f9288c171ee1478f4b4c52a84ea0))
+-  Handle the websocet in `handle_socket` itself ([`e61de9a`](https://git.4rs.nl/oxidetalis/oxidetalis/commit/e61de9a8b1cc9ad060c8501b2f5aedfc959c37af))
 -  Use old alert blocks style ([`972740f`](https://git.4rs.nl/oxidetalis/oxidetalis/commit/972740f03e05d960626230a70db57ff5ff0f0631))
 ### Removed
 -  Remove user registration body ([`0e26557`](https://git.4rs.nl/oxidetalis/oxidetalis/commit/0e2655712806cc4b859e1c239282cfbc5c905aa1))
