@@ -31,7 +31,7 @@ use crate::prelude::*;
 #[sea_orm(table_name = "users")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    pub id:          UserId,
+    pub id:          IdCol,
     pub public_key:  PublicKey,
     pub last_logout: chrono::DateTime<Utc>,
     pub is_admin:    bool,
@@ -39,17 +39,17 @@ pub struct Model {
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
-    #[sea_orm(has_many = "InChatRequestsEntity")]
-    InChatRequests,
+    #[sea_orm(has_many = "IncomingChatEntity")]
+    IncomingChat,
     #[sea_orm(has_many = "OutChatRequestsEntity")]
     OutChatRequests,
     #[sea_orm(has_many = "UsersStatusEntity")]
     UsersStatus,
 }
 
-impl Related<InChatRequestsEntity> for Entity {
+impl Related<IncomingChatEntity> for Entity {
     fn to() -> RelationDef {
-        Relation::InChatRequests.def()
+        Relation::IncomingChat.def()
     }
 }
 

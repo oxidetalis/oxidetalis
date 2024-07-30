@@ -16,12 +16,12 @@
 
 //! Database trait extensions.
 
-mod in_chat_requests;
+mod incoming_chat;
 mod out_chat_requests;
 mod user;
 mod user_status;
 
-pub use in_chat_requests::*;
+pub use incoming_chat::*;
 pub use out_chat_requests::*;
 pub use user::*;
 pub use user_status::*;

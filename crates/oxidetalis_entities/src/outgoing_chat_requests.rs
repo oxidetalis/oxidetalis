@@ -31,8 +31,8 @@ use crate::prelude::*;
 #[sea_orm(table_name = "out_chat_requests")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    pub id:        UserId,
-    pub sender_id: UserId,
+    pub id:        IdCol,
+    pub sender_id: IdCol,
     /// Public key of the recipient
     pub recipient: PublicKey,
     /// The timestamp of the request, when it was sent

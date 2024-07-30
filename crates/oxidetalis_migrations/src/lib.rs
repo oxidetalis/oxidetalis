@@ -24,7 +24,7 @@
 use sea_orm_migration::prelude::*;
 pub use sea_orm_migration::MigratorTrait;
 
-mod create_incoming_chat_requests_table;
+mod create_incoming_chat_table;
 mod create_outgoing_chat_requests_table;
 mod create_users_status;
 mod create_users_table;
@@ -36,7 +36,7 @@ impl MigratorTrait for Migrator {
     fn migrations() -> Vec<Box<dyn MigrationTrait>> {
         vec![
             Box::new(create_users_table::Migration),
-            Box::new(create_incoming_chat_requests_table::Migration),
+            Box::new(create_incoming_chat_table::Migration),
             Box::new(create_outgoing_chat_requests_table::Migration),
             Box::new(create_users_status::Migration),
         ]

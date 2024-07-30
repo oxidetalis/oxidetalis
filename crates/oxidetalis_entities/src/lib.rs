@@ -21,7 +21,7 @@
 
 #![doc = include_str!("../README.md")]
 
-pub mod incoming_chat_requests;
+pub mod incoming_chat;
 pub mod outgoing_chat_requests;
 pub mod prelude;
 pub mod users;

@@ -19,7 +19,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-//! Entity for `in_chat_requests` table
+//! Entity for `incoming_chat` table
 
 use chrono::Utc;
 use oxidetalis_core::types::PublicKey;
@@ -28,15 +28,18 @@ use sea_orm::entity::prelude::*;
 use crate::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
-#[sea_orm(table_name = "in_chat_requests")]
+#[sea_orm(table_name = "incoming_chat")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    pub id:           UserId,
-    pub recipient_id: UserId,
+    pub id:                 IdCol,
+    pub recipient_id:       IdCol,
     /// Public key of the sender
-    pub sender:       PublicKey,
+    pub sender:             PublicKey,
+    /// Whether the chat response accepted or not.
+    /// This will be `None` if it is chat request, otherwise `bool`
+    pub accepted_response:  Option<bool>,
     /// The timestamp of the request, when it was received
-    pub in_on:        chrono::DateTime<Utc>,
+    pub received_timestamp: chrono::DateTime<Utc>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

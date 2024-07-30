@@ -46,7 +46,7 @@ pub use events::*;
 use uuid::Uuid;
 
 use crate::{
-    database::UserTableExt,
+    database::{IncomingChatExt, UserTableExt},
     extensions::{DepotExt, OnlineUsersExt},
     middlewares,
     nonce::NonceCache,
@@ -144,8 +144,9 @@ async fn handle_socket(
         .await;
     log::info!("New user connected: ConnId(={conn_id}) PublicKey(={user_public_key})");
 
-    // TODO: Send the incoming chat request to the user, while they are offline.
-    // This after adding last_login col to the user table
+    if let Some(server_user) = &user {
+        send_chat_requests_and_responses(&db_conn, &user_shared_secret, &sender, server_user).await;
+    }
 
     while let Some(Ok(msg)) = user_ws_receiver.next().await {
         match handle_ws_msg(msg, &nonce_cache, &user_shared_secret).await {
@@ -174,6 +175,56 @@ async fn handle_socket(
         };
     }
     user_disconnected(&db_conn, &conn_id, &user_public_key, user).await;
+}
+
+/// Send the incoming chat requests and responses to the user while they were
+/// offline
+///
+/// ### Note
+/// The errors are ignored, if there is an issue with user connection, the user
+/// will be disconnected after this function is called.
+///
+/// Also we make sure that the user receives the chat requests and responses
+/// before we delete them from the database.
+async fn send_chat_requests_and_responses(
+    db_conn: &DatabaseConnection,
+    user_shared_secret: &[u8; 32],
+    sender: &mpsc::UnboundedSender<Result<Message, salvo::Error>>,
+    server_user: &UserModel,
+) {
+    let Ok(requests) = db_conn.get_all_chat_requests(server_user).await else {
+        return;
+    };
+    let Ok(responses) = db_conn.get_all_chat_responses(server_user).await else {
+        return;
+    };
+
+    for request in requests {
+        if sender
+            .unbounded_send(Ok(ServerEvent::chat_request(&request.sender)
+                .sign(user_shared_secret)
+                .as_ref()
+                .into()))
+            .is_ok()
+        {
+            let _ = request.delete(db_conn).await;
+        }
+    }
+
+    for response in responses {
+        if sender
+            .unbounded_send(Ok(ServerEvent::chat_request_response(
+                response.sender,
+                response.accepted_response.unwrap_or_default(),
+            )
+            .sign(user_shared_secret)
+            .as_ref()
+            .into()))
+            .is_ok()
+        {
+            let _ = response.delete(db_conn).await;
+        }
+    }
 }
 
 /// Handle websocket msg

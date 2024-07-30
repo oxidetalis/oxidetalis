@@ -19,8 +19,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-//! Migration to create the `in_chat_requests` table, a table for incoming chat
-//! requests from other users
+//! Migration to create the `incoming_chat` table, a table for incoming chat
+//! requests and responses from other users
 
 use sea_orm_migration::prelude::*;
 
@@ -35,31 +35,37 @@ impl MigrationTrait for Migration {
         manager
             .create_table(
                 Table::create()
-                    .table(InChatRequests::Table)
+                    .table(IncomingChat::Table)
                     .if_not_exists()
                     .col(
-                        ColumnDef::new(InChatRequests::Id)
+                        ColumnDef::new(IncomingChat::Id)
                             .big_integer()
                             .not_null()
                             .auto_increment()
                             .primary_key(),
                     )
                     .col(
-                        ColumnDef::new(InChatRequests::RecipientId)
+                        ColumnDef::new(IncomingChat::RecipientId)
                             .big_integer()
                             .not_null(),
                     )
                     .foreign_key(
                         ForeignKey::create()
-                            .name("fk-in_chat_requests-users")
-                            .from(InChatRequests::Table, InChatRequests::RecipientId)
+                            .name("fk-incoming_chat-users")
+                            .from(IncomingChat::Table, IncomingChat::RecipientId)
                             .to(Users::Table, Users::Id)
                             .on_update(ForeignKeyAction::NoAction)
                             .on_delete(ForeignKeyAction::Cascade),
                     )
-                    .col(ColumnDef::new(InChatRequests::Sender).binary().not_null())
+                    .col(ColumnDef::new(IncomingChat::Sender).binary().not_null())
                     .col(
-                        ColumnDef::new(InChatRequests::InOn)
+                        ColumnDef::new(IncomingChat::AcceptedResponse)
+                            .boolean()
+                            .null()
+                            .default(Option::<bool>::None),
+                    )
+                    .col(
+                        ColumnDef::new(IncomingChat::ReceivedTimestamp)
                             .timestamp_with_time_zone()
                             .not_null(),
                     )
@@ -71,9 +77,10 @@ impl MigrationTrait for Migration {
                 Index::create()
                     .if_not_exists()
                     .name("sep_request")
-                    .table(InChatRequests::Table)
-                    .col(InChatRequests::RecipientId)
-                    .col(InChatRequests::Sender)
+                    .table(IncomingChat::Table)
+                    .col(IncomingChat::RecipientId)
+                    .col(IncomingChat::Sender)
+                    .col(IncomingChat::AcceptedResponse)
                     .unique()
                     .to_owned(),
             )
@@ -82,11 +89,13 @@ impl MigrationTrait for Migration {
 }
 
 #[derive(DeriveIden)]
-enum InChatRequests {
+enum IncomingChat {
     Table,
     Id,
     RecipientId,
     /// Public key of the sender
     Sender,
-    InOn,
+    /// Whether the chat response accepted or not
+    AcceptedResponse,
+    ReceivedTimestamp,
 }

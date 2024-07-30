@@ -38,13 +38,13 @@ pub use sea_orm::{
 };
 
 /// User ID type
-pub type UserId = i64;
+pub(crate) type IdCol = i64;
 
-pub use super::incoming_chat_requests::{
-    ActiveModel as InChatRequestsActiveModel,
-    Column as InChatRequestsColumn,
-    Entity as InChatRequestsEntity,
-    Model as InChatRequestsModel,
+pub use super::incoming_chat::{
+    ActiveModel as IncomingChatActiveModel,
+    Column as IncomingChatColumn,
+    Entity as IncomingChatEntity,
+    Model as IncomingChatModel,
 };
 pub use super::outgoing_chat_requests::{
     ActiveModel as OutChatRequestsActiveModel,

@@ -40,8 +40,8 @@ pub enum AccessStatus {
 #[sea_orm(table_name = "users_status")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    pub id:         UserId,
-    pub user_id:    UserId,
+    pub id:         IdCol,
+    pub user_id:    IdCol,
     pub target:     PublicKey,
     pub status:     AccessStatus,
     pub updated_at: chrono::DateTime<Utc>,
