@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 -  Remove the nonce cache limit ([`d442e73`](https://git.4rs.nl/oxidetalis/oxidetalis/commit/d442e73ed7253f2fa8c381029058d51627de25b3))
 -  Use Scalar as default openapi UI ([`221a47c`](https://git.4rs.nl/oxidetalis/oxidetalis/commit/221a47cfd03d12a759dc9acafb56380be4bf2502))
 -  Change config private key type to `K256Secret` ([`a01f4ad`](https://git.4rs.nl/oxidetalis/oxidetalis/commit/a01f4add0c377016311db7f5efc94d55ac9a5dc0))
+-  Refactor `in_chat_requests` table ([`fc0642f`](https://git.4rs.nl/oxidetalis/oxidetalis/commit/fc0642fce6b87ae06206413a9c2a325e64998002))
 -  Update public key column type from `String` to `PublicKey` ([`1d1bb96`](https://git.4rs.nl/oxidetalis/oxidetalis/commit/1d1bb962bb95e4fc6d9c821accb1df116a1bc759))
 -  Use `PublicKey` and `Signature` as parameters ([`20a8ac6`](https://git.4rs.nl/oxidetalis/oxidetalis/commit/20a8ac67153fc556e6e64ee72fa80f5808bc49e8))
 ### Fixed
